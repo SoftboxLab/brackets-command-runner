@@ -1,0 +1,9 @@
+[{
+    "label": "ls -> Listar diretórios",
+    "cmd": "ls",
+    "args" : "dir"
+}, {
+    "label": "pwd -> Exibir diretórios",
+    "cmd": "pwd",
+    "args" : ""
+}]
