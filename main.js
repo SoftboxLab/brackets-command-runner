@@ -364,17 +364,23 @@ define(function (require, exports, module) {
                 
                 //if (DEBUG) alert("Erro cmd: " + JSON.stringify(err));
                 
-                //appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' '));
+                appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' '));
                 //appendOutput(data);
                 
-                if (callback && typeof callback === 'function') {
-                    callback(err, data);
-                }
+                //if (callback && typeof callback === 'function') {
+                //    callback(err, data);
+                //}
             });
             
             promise.done(function (data) {
                 if (callback && typeof callback === 'function') {
-                    callback(false, data);
+                    var idx = data.indexOf(':');
+                    
+                    var ret = data.substr(0, idx);
+                    
+                    data = data.substr(idx + 1);
+                    
+                    callback(ret === 'err', data);
                 }
             });
         }
