@@ -242,7 +242,12 @@ define(function (require, exports, module) {
         $('#brackets-cmd-runner-args-text').html(cmdSelected.cmd);
         $('#brackets-cmd-runner-args-val').val(cmdSelected.args);
         
-        panelArgs.show();
+        if (getParams(cmdSelected.cmd).length === 0) {
+            runCommand(cmdSelected, '', btnClose);
+            
+        } else {
+            panelArgs.show();
+        }
         
         //TODO Melhorar
         setTimeout(function() {
