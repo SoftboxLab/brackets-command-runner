@@ -8,7 +8,7 @@
     "args" : "dir",
     "key" : "Ctrl-Shift-N"
 }, {
-    "label": "Quem sou eux?",
+    "label": "Quem sou eu?",
     "cmd": "whoami",
     "args" : "",
     "key" : "Ctrl-Shift-Y"
