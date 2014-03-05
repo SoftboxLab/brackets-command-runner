@@ -14,7 +14,7 @@
     "key" : "Ctrl-Shift-Y"
 }, {
     "label": "Atualizar Servidor",
-    "cmd": "git pull",
-    "args" : "",
+    "cmd": "git commit -a -m ",
+    "args" : "Mensagem",
     "key" : ""
 }]
