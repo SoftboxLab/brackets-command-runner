@@ -27,62 +27,112 @@ define(function (require, exports, module) {
     var panelOutHtml  = require("text!html/panel_output.html");
     var panelArgsHtml = require("text!html/panel_args.html");
     
-    var panelOut, 
-        panelArgs,
-        cmdConfig,
-        cmdSelected;
+    var panelOut,       // Painel de saida.
+        panelArgs,      // Painel utilizado para entrada de argumentos.
+        cmdConfig,      // Configuracoes do projeto.
+        cmdSelected;    // Comando corrente selecionado.
     
-    var DEBUG = true;
+    var DEBUG = true;   // Debug
     
-     var cmdRunner = CommandManager.register("Open Command Runner", COMMAND_RUNNER, openSearch),
-        fileMenu   = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
+    var cmdRunner = CommandManager.register("Open Command Runner", COMMAND_RUNNER, openSearch),
+        fileMenu  = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
+    
+    // Funcao que executa comandos atraves do NodeJS
+    var execCmdFnc = function(cmd, args, opts, callback) {
+        alert('Can not run the command, because NodeJS bridge not loaded!');
+    };
         
     //fileMenu.addMenuDivider();
     fileMenu.addMenuItem(cmdRunner);
         
     KeyBindingManager.addBinding(COMMAND_RUNNER, {key: "Ctrl-Shift-M"});
     
+    /**
+     * Remove todas as hotkeys associadas.
+     */
+    function unbindAllHotkeys() {
+        if (!cmdConfig) {
+            return;
+        }
+        
+        for (var i = 0; i < cmdConfig.length; i++) {
+            var cmd = cmdConfig[i];
+
+            if (cmd.key) {
+                KeyBindingManager.removeBinding(cmd.key);
+            }
+        }
+    }
     
-    // Realiza o parse do arquivo de configurar e carrega os comandos na
-    // variavel de configuracao geral.
-    function parseCfgFile(cfgData) {
+    /**
+     * Cria uma funcao de evento para execucao de uma tecla de atalho.
+     */
+    function createCommand(cmd) {
+        return function() {
+            cmdSelected = cmd;
+
+            showInputArgs();
+        };
+    }
+    
+    /**
+     * Realiza o parse do arquivo de configuracao, remove todos os eventos associados anteriormente
+     * e por fim carregar as novas configuracoes.
+     *
+     * @param {string} cfgData String contendo as informacoes de configuracao.
+     */
+    function loadConfigs(cfgData) {
         try {
             var cfg = JSON.parse(cfgData);
 
-            if (cfg) {
-                cmdConfig = cfg;
+            if (!cfg) {
+                return;                
             }
-
+                                    
+            unbindAllHotkeys();
+            
+            cmdConfig = cfg;
+            
+            for (var i = 0; i < cmdConfig.length; i++) {
+                var cmd = cmdConfig[i];
+                
+                if (cmd.key) {
+                    var cmdObj = CommandManager.register(cmd.label, COMMAND_RUNNER + '.cmd-' + i, createCommand(cmd));
+                    
+                    KeyBindingManager.addBinding(cmdObj, {key: cmd.key});                    
+                }
+            }
         } catch(err) {
-            appendOutput('Erro ao carregar o arquivo package.json: ' + err);
+            appendOutput('Erro ao carregar o arquivo cmdrunner.json: ' + err);
             cmdConfig = [];
         }
     }
     
-    // Funcao que carrega o arquivo de configuracao do executor de comandos.    
-    function loadCmdRunnerFile() {
-        var rootPath = ProjectManager.getProjectRoot().fullPath;
-        var cmdCfgFile = FileSystem.getFileForPath(rootPath + 'cmdrunner.json');
+    /**
+     * Carrega o arquivo de configuracao do executor de comandos.
+     */
+    function readConfigFile() {
+        var rootPath   = ProjectManager.getProjectRoot().fullPath,
+            cmdCfgFile = FileSystem.getFileForPath(rootPath + 'cmdrunner.json');
         
         FileUtils.readAsText(cmdCfgFile).done(function (rawText) {
-            parseCfgFile(rawText);
+            loadConfigs(rawText);
         });
     }
     
-    $(ProjectManager).on('projectOpen projectRefresh', loadCmdRunnerFile);
+    // Eventos que determinam a carga do arquivo de configuracao do cmd runner.
+    $(ProjectManager).on('projectOpen projectRefresh', readConfigFile);
     $(DocumentManager).on("documentSaved", function(evt, doc) {
-        console.log(doc.file.name ); 
         if (doc.file.name == 'cmdrunner.json') {
-            loadCmdRunnerFile();
+            readConfigFile();
         }
     });
     
-    // Funcao que executa comandos atraves do NodeJS
-    var execCmdFnc = function(cmd, args, opts, callback) {
-        alert('Can not run the command, because NodeJS bridge not loaded!');
-    };
-    
-    // Adiciona o texto fornecido no painel inferior.
+    /**
+     * Adiciona o texto fornecido no painel inferior.
+     *
+     * @param {string} output String contendo o texto que sera adicionado ao painel de saida.
+     */
     function appendOutput(output) {
         if (!panelOut) {
             panelOut = PanelManager.createBottomPanel(COMMAND_RUNNER + '.output', $(panelOutHtml));
@@ -105,7 +155,9 @@ define(function (require, exports, module) {
         elem.animate({ scrollTop: elem[0].scrollHeight }, "slow");
     }
     
-    // Exibe paneil inferior para fornecer parametros para o comando.
+    /** 
+     * Exibe paneil inferior para fornecer parametros para o comando.
+     */
     function showInputArgs() {
         if (!panelArgs) {
             panelArgs = PanelManager.createBottomPanel(COMMAND_RUNNER + '.args', $(panelArgsHtml), 40);
@@ -157,8 +209,27 @@ define(function (require, exports, module) {
         }, 350);
     }
     
+    /**
+     * Abre o paneil de busca de comandos.
+     */
     function openSearch() {
         QuickOpen.beginSearch("#", "");
+    }
+    
+    /**
+     * Helper function that chains a series of promise-returning functions together via their 
+     * done callbacks.
+     */
+    function chain() {
+        var functions = Array.prototype.slice.call(arguments, 0);
+        
+        if (functions.length > 0) {
+            var firstFunction = functions.shift();
+            var firstPromise = firstFunction.call();
+            firstPromise.done(function () {
+                chain.apply(null, functions);
+            });
+        }
     }
     
     QuickOpen.addQuickOpenPlugin({
@@ -198,20 +269,7 @@ define(function (require, exports, module) {
         matcherOptions: { segmentedSearch: true }
     });
     
-    // Helper function that chains a series of promise-returning
-    // functions together via their done callbacks.
-    function chain() {
-        var functions = Array.prototype.slice.call(arguments, 0);
-        
-        if (functions.length > 0) {
-            var firstFunction = functions.shift();
-            var firstPromise = firstFunction.call();
-            firstPromise.done(function () {
-                chain.apply(null, functions);
-            });
-        }
-    }
-    
+
     // Inicia conexao com NodeJS
     AppInit.appReady(function () {
         var path = ExtensionUtils.getModulePath(module, "node/NodeBridgeDomain");
