@@ -359,17 +359,22 @@ define(function (require, exports, module) {
         function execCmd(cmd, args, options, callback) {
             var promise = nodeConnection.domains.nodebridge.execCmd(cmd, args, options);
             
-            promise.fail(function (err) {
+            promise.fail(function (err, data) {
                 console.error("[brackets-tekton] execution: '" + cmd + "'", err);
                 
                 //if (DEBUG) alert("Erro cmd: " + JSON.stringify(err));
                 
-                appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' '));
+                //appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' '));
+                appendOutput(data);
+                
+                if (callback && typeof callback === 'function') {
+                    callback(err, data);
+                }
             });
             
             promise.done(function (data) {
                 if (callback && typeof callback === 'function') {
-                    callback(data);
+                    callback(false, data);
                 }
             });
         }
