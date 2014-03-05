@@ -7,4 +7,9 @@
     "cmd": "pwd",
     "args" : "dir",
     "key" : "Ctrl-Shift-N"
+}, {
+    "label": "Quem sou eu?",
+    "cmd": "whoami",
+    "args" : "",
+    "key" : "Ctrl-Shift-Y"
 }]
