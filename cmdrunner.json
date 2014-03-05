@@ -8,12 +8,12 @@
     "args" : [],
     "key" : "Ctrl-Shift-N"
 }, {
-    "label": "Quem sou eux?",
-    "cmd": "whoami",
+    "label": "Git Status",
+    "cmd": "git status",
     "args" : [],
     "key" : ""
 }, {
-    "label": "Atualizar Servidor",
+    "label": "Git Commit All",
     "cmd": "git commit -a -m '$0'",
     "args" : ["mensagem"],
     "key" : "Ctrl-Shift-Y"
