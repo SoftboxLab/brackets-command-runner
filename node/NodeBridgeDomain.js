@@ -54,6 +54,7 @@
 
         child = exec(cmd + ' ' + args.join(' '), function (error, stdout, stderr) {
             log(error ? ('Exec Ok!') : ('Exec fail'));
+            log('stdout', stdout, 'stderr', stderr);
 
             callback(error, error ? stderr : stdout);
         });
