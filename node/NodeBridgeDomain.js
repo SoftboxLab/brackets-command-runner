@@ -9,7 +9,7 @@
 
     function log() {
         var elems = Array.prototype.splice.call(arguments, 0);
-        var log = [];
+        var arrLog = [];
 
         elems.forEach(function(elem) {
             var msg = elem;
@@ -18,10 +18,28 @@
                 msg = JSON.stringify(elem);     
             }
 
-            log.push(msg);
+            arrLog.push(msg);
         });
 
-        fs.appendFile(LOG_FILE, log.join(' ') + '\n');
+        fs.appendFile(LOG_FILE, arrLog.join(' ') + '\n');
+    }
+    
+    function execConfis(options) {
+        if (!options) {
+            return;
+        }
+        
+        if (options.defaultPath) {
+            try {
+                process.chdir(options.defaultPath);
+            } catch (err) {
+                log('Error changing to default path: ', err);
+            }
+        }
+
+        if (options.logFile) {
+            LOG_FILE = options.logFile;
+        }
     }
 
     function execCmd(cmd, args, options, callback) {
@@ -30,9 +48,7 @@
 
         args = args || [];
         
-        //if (path) {
-        //    process.chdir(path);
-        //}
+        execConfis(options);
 
         log('ExecCmd: ', cmd, args, options);
 

@@ -147,7 +147,7 @@ define(function (require, exports, module) {
         output = output || '';
         
         output.split('\n').forEach(function(row) {
-            elem.append('<div>' + Mustache.render('{{row}}', {row: row}) + '</div>');            
+            elem.append('<div>' + Mustache.render('{{row}}', {row: row}) + '&nbsp;</div>');            
         });
         
         panelOut.show();
@@ -177,20 +177,33 @@ define(function (require, exports, module) {
                 btnClose.click();
             });
             
+            input.keydown(function(evt) {
+                if (evt.which === 27) {
+                    btnClose.click();
+                }
+            });
+            
             input.keypress(function(evt) {
                 if (evt.which === 13) {
                     var command = cmdSelected.cmd;
                     var args = $('#brackets-cmd-runner-args-val').val().split(':');
+                    var rootPath   = ProjectManager.getProjectRoot().fullPath;
                     
-                    appendOutput(' \nExecuting: ' + command + JSON.stringify(args));
+                    var opts = {
+                        defaultPath: rootPath
+                    };
                     
-                    execCmdFnc(command, args, null, function(data) {
+                    appendOutput('Executing: ' + command + ' ' + args.join(' '));
+                    
+                    execCmdFnc(command, args, opts, function(data) {
                         appendOutput(data);
                         
                         // Fechar antes nao esta funcionado.... =(
                         btnClose.click();
                     });
-                }
+                    
+                    return;
+                }                
             });
         } 
         
@@ -310,7 +323,9 @@ define(function (require, exports, module) {
             promise.fail(function (err) {
                 console.error("[brackets-tekton] execution: '" + cmd + "'", err);
                 
-                if (DEBUG) alert("Erro cmd: " + JSON.stringify(err));
+                //if (DEBUG) alert("Erro cmd: " + JSON.stringify(err));
+                
+                appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' '));
             });
             
             promise.done(function (data) {
