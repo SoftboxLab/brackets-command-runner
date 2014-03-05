@@ -55,10 +55,10 @@
         child = exec(cmd + ' ' + args.join(' '), function (error, stdout, stderr) {
             log(error ? ('Exec Ok!') : ('Exec fail'));
 
-            //callback(null, stdout);
+            callback(error, error ? stderr : stdout);
         });
 
-        child.stdout.on("data", function (data) {
+        /*child.stdout.on("data", function (data) {
             log('Data: ', data);
 
             domainManager.emitEvent("nodeexec", "update", [data]);
@@ -68,7 +68,7 @@
             log('Data: ', data);
 
             domainManager.emitEvent("nodeexec", "update", [data]);
-        });
+        });*/
     }
 
     function init(DomainManager) {
