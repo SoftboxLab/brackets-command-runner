@@ -242,6 +242,8 @@ define(function (require, exports, module) {
         $('#brackets-cmd-runner-args-text').html(cmdSelected.cmd);
         $('#brackets-cmd-runner-args-val').val(cmdSelected.args);
         
+        // So exibe a caixa de argumentos, se existir pelo menos uma marcacao 
+        // de parametros na construcao do comando.
         if (getParams(cmdSelected.cmd).length === 0) {
             runCommand(cmdSelected, '', btnClose);
             

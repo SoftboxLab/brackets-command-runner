@@ -53,9 +53,9 @@
         log('ExecCmd: ', cmd, args, options);
 
         child = exec(cmd + ' ' + args.join(' '), function (error, stdout, stderr) {
-            log('Exec Ok!');
+            log(error ? ('Exec Ok!') : ('Exec fail'));
 
-            callback(error, stdout);
+            //callback(null, stdout);
         });
 
         child.stdout.on("data", function (data) {
