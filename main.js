@@ -196,7 +196,7 @@ define(function (require, exports, module) {
 
         appendOutput('Executing: ' + command);
 
-        execCmdFnc(command, null, opts, function(data) {
+        execCmdFnc(command, null, opts, function(err, data) {
             appendOutput(data);
 
             // Fechar antes nao esta funcionado.... =(
@@ -360,12 +360,12 @@ define(function (require, exports, module) {
             var promise = nodeConnection.domains.nodebridge.execCmd(cmd, args, options);
             
             promise.fail(function (err, data) {
-                console.error("[brackets-tekton] execution: '" + cmd + "'", err);
+                console.error("[brackets-tekton] execution: '", arguments);
                 
                 //if (DEBUG) alert("Erro cmd: " + JSON.stringify(err));
                 
                 //appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' '));
-                appendOutput(data);
+                //appendOutput(data);
                 
                 if (callback && typeof callback === 'function') {
                     callback(err, data);
