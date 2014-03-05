@@ -1,20 +1,20 @@
 [{
     "label": "ls -> Listar diretórios",
     "cmd": "ls",
-    "args" : "dir"
+    "args" : []
 }, {
     "label": "pwd -> Exibir diretórios",
     "cmd": "pwd",
-    "args" : "dir",
+    "args" : [],
     "key" : "Ctrl-Shift-N"
 }, {
     "label": "Quem sou eux?",
     "cmd": "whoami",
-    "args" : "",
+    "args" : [],
     "key" : ""
 }, {
     "label": "Atualizar Servidor",
-    "cmd": "git commit -a -m ",
-    "args" : "Mensagem",
+    "cmd": "git commit -a -m '$0'",
+    "args" : ["mensagem"],
     "key" : "Ctrl-Shift-Y"
 }]

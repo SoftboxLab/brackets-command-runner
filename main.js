@@ -155,6 +155,49 @@ define(function (require, exports, module) {
         elem.animate({ scrollTop: elem[0].scrollHeight }, "slow");
     }
     
+    function getParams(command) {
+        var re = /\$[0-9]+/g,
+            matches = [],
+            m;
+
+        while ((m = re.exec(command)) !== null) {
+            m = m[0].substr(1);
+            
+            if (m.match('[0-9]+')) {
+                matches.push(m);
+            }
+        }
+
+        return matches;
+    }
+    
+    function buildCommand(command, params, args) {    
+        for (var i = 0; i < params.length; i++) {
+            var idx = parseInt(params[i]);
+            
+            command = command.replace(new RegExp('\\$' + params[i], 'g'), !isNaN(idx) && args[idx] ? args[idx] : '');
+        }
+        
+        return command;
+    }
+    
+    function runCommand(objCmd, args, btnClose) {
+        var opts = {
+            defaultPath: ProjectManager.getProjectRoot().fullPath
+        };
+        
+        var command = buildCommand(objCmd.cmd, getParams(objCmd.cmd), objCmd.args);
+
+        appendOutput('Executing: ' + command);
+
+        execCmdFnc(command, null, opts, function(data) {
+            appendOutput(data);
+
+            // Fechar antes nao esta funcionado.... =(
+            btnClose.click();
+        });
+    }
+    
     /** 
      * Exibe paneil inferior para fornecer parametros para o comando.
      */
@@ -185,24 +228,7 @@ define(function (require, exports, module) {
             
             input.keypress(function(evt) {
                 if (evt.which === 13) {
-                    var command = cmdSelected.cmd;
-                    var args = $('#brackets-cmd-runner-args-val').val().split(':');
-                    var rootPath   = ProjectManager.getProjectRoot().fullPath;
-                    
-                    var opts = {
-                        defaultPath: rootPath
-                    };
-                    
-                    appendOutput('Executing: ' + command + ' ' + args.join(' '));
-                    
-                    execCmdFnc(command, args, opts, function(data) {
-                        appendOutput(data);
-                        
-                        // Fechar antes nao esta funcionado.... =(
-                        btnClose.click();
-                    });
-                    
-                    return;
+                    runCommand(cmdSelected, $('#brackets-cmd-runner-args-val').val().split(':'), btnClose);
                 }                
             });
         } 
