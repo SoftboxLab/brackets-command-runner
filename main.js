@@ -171,11 +171,17 @@ define(function (require, exports, module) {
         return matches;
     }
     
-    function buildCommand(command, params, args) {    
+    function buildCommand(command, params, args, argsDefault) {    
         for (var i = 0; i < params.length; i++) {
             var idx = parseInt(params[i]);
             
-            command = command.replace(new RegExp('\\$' + params[i], 'g'), !isNaN(idx) && args[idx] ? args[idx] : '');
+            var value = '';
+            
+            if (!isNaN(idx)) {
+                value = args[idx] ? args[idx] : (argsDefault[idx] ? argsDefault[idx] : '');
+            }
+            
+            command = command.replace(new RegExp('\\$' + params[i], 'g'), value);
         }
         
         return command;
@@ -186,7 +192,7 @@ define(function (require, exports, module) {
             defaultPath: ProjectManager.getProjectRoot().fullPath
         };
         
-        var command = buildCommand(objCmd.cmd, getParams(objCmd.cmd), objCmd.args);
+        var command = buildCommand(objCmd.cmd, getParams(objCmd.cmd), args, objCmd.args);
 
         appendOutput('Executing: ' + command);
 
