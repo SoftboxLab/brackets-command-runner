@@ -63,6 +63,12 @@
 
             domainManager.emitEvent("nodeexec", "update", [data]);
         });
+        
+        child.stderr.on("data", function (data) {
+            log('Data: ', data);
+
+            domainManager.emitEvent("nodeexec", "update", [data]);
+        });
     }
 
     function init(DomainManager) {
