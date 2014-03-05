@@ -56,7 +56,7 @@
             log(error ? ('Exec Ok!') : ('Exec fail'));
             log('stdout', stdout, 'stderr', stderr);
 
-            callback(error, error ? stderr : stdout);
+            callback(false, (error ? 'err:' : 'ok:') + stdout + stderr);
         });
 
         /*child.stdout.on("data", function (data) {
