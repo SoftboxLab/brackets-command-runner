@@ -11,10 +11,10 @@
     "label": "Quem sou eux?",
     "cmd": "whoami",
     "args" : "",
-    "key" : "Ctrl-Shift-Y"
+    "key" : ""
 }, {
     "label": "Atualizar Servidor",
     "cmd": "git commit -a -m ",
     "args" : "Mensagem",
-    "key" : ""
+    "key" : "Ctrl-Shift-Y"
 }]
