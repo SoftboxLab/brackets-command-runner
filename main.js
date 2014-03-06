@@ -133,7 +133,7 @@ define(function (require, exports, module) {
      *
      * @param {string} output String contendo o texto que sera adicionado ao painel de saida.
      */
-    function appendOutput(output) {
+    function appendOutput(output, color) {
         if (!panelOut) {
             panelOut = PanelManager.createBottomPanel(COMMAND_RUNNER + '.output', $(panelOutHtml));
             
@@ -145,8 +145,11 @@ define(function (require, exports, module) {
         var elem = $('#brackets-cmd-runner-console');
 
         output = output || '';
+        color = color || 'white';
         
-        elem.append('<span style="font-color: red">' + Mustache.render('{{row}}\n', {row: output}) + '</span>');            
+        var tmplate = [];
+        
+        elem.append('<span style="color: ' + color + '">' + Mustache.render('{{row}}\n', {row: output}) + '</span>');            
         
         panelOut.show();
         
@@ -195,10 +198,12 @@ define(function (require, exports, module) {
         appendOutput('Executing: ' + command);
 
         execCmdFnc(command, null, opts, function(err, data) {
-            appendOutput(data);
-
-            // Fechar antes nao esta funcionado.... =(
-            btnClose.click();
+            appendOutput(data, err ? 'red' : 'white');
+            
+            if (btnClose) {
+                // Fechar antes nao esta funcionado.... =(
+                btnClose.click();
+            }
         });
     }
     
@@ -243,7 +248,7 @@ define(function (require, exports, module) {
         // So exibe a caixa de argumentos, se existir pelo menos uma marcacao 
         // de parametros na construcao do comando.
         if (getParams(cmdSelected.cmd).length === 0) {
-            runCommand(cmdSelected, '', btnClose);
+            runCommand(cmdSelected, '');
             
         } else {
             panelArgs.show();
