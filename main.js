@@ -146,11 +146,7 @@ define(function (require, exports, module) {
 
         output = output || '';
         
-        /*output.split('\n').forEach(function(row) {
-            
-        });*/
-        
-        elem.append(/*'<div>' + */Mustache.render('{{row}}', {row: output}) /*+ '&nbsp;</div>'*/);            
+        elem.append(Mustache.render('{{row}}', {row: output}));            
         
         panelOut.show();
         
