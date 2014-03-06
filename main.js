@@ -37,6 +37,17 @@ define(function (require, exports, module) {
     var cmdRunner = CommandManager.register("Open Command Runner", COMMAND_RUNNER, openSearch),
         fileMenu  = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
     
+    var hotkeyPressed = false;
+    
+    /*$(document).keydown(function(evt) {
+        if (hotkeyPressed 
+                && evt.shiftKey 
+                && evt.ctrlKey
+                && String.fromCharCode(evt.which).toUpperCase() == 'K') {
+            
+        }
+    });*/
+    
     // Funcao que executa comandos atraves do NodeJS
     var execCmdFnc = function(cmd, args, opts, callback) {
         alert('Can not run the command, because NodeJS bridge not loaded!');
@@ -188,6 +199,13 @@ define(function (require, exports, module) {
         return command;
     }
     
+    /**
+     * Executa o comando fornecido e imprime a saida no painel.
+     *
+     * @param {object} objCmd Objeto que contem as informacoes do comando que sera executado.
+     * @param {array} args Array com os argumentos fornecidos pelo usuario.
+     * @param {DOMElem} btnClose Botao que fecha o painel de input de argumentos.
+     */
     function runCommand(objCmd, args, btnClose) {
         var opts = {
             defaultPath: ProjectManager.getProjectRoot().fullPath
@@ -269,6 +287,12 @@ define(function (require, exports, module) {
      */
     function openSearch() {
         QuickOpen.beginSearch("#", "");
+        
+        hotkeyPressed = true;
+        
+        setTimeout(function() {
+            hotkeyPressed = false;
+        }, 300);
     }
     
     /**

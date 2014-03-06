@@ -1,20 +1,16 @@
 [{
-    "label": "ls -> Listar diretórios",
-    "cmd": "ls",
-    "args" : []
-}, {
-    "label": "pwd -> Exibir diretórios",
-    "cmd": "pwd",
-    "args" : [],
-    "key" : "Ctrl-Shift-N"
-}, {
     "label": "Git Status",
     "cmd": "git status",
     "args" : [],
-    "key" : ""
+    "key" : "Ctrl-Alt-Shift-S"
 }, {
     "label": "Git Commit All",
     "cmd": "git commit -a -m '$0'",
-    "args" : ["mensagem"],
-    "key" : "Ctrl-Shift-Y"
+    "args" : ["Informe seu comentário aqui!"],
+    "key" : "Ctrl-Alt-Shift-C"
+}, {
+    "label": "Git Push",
+    "cmd": "git push",
+    "args" : [],
+    "key" : "Ctrl-Alt-Shift-P"
 }]
