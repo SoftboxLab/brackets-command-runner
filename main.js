@@ -293,7 +293,7 @@ define(function (require, exports, module) {
         setTimeout(function() {
             hotkeyPressed = false;
         }, 300);
-    }
+    } 
     
     /**
      * Helper function that chains a series of promise-returning functions together via their 
