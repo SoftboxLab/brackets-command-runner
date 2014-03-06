@@ -146,7 +146,7 @@ define(function (require, exports, module) {
 
         output = output || '';
         
-        elem.append(Mustache.render('{{row}}', {row: output}));            
+        elem.append('<span style="font-color: red">' + Mustache.render('{{row}}\n', {row: output}) + '</span>');            
         
         panelOut.show();
         
