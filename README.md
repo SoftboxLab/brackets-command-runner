@@ -42,6 +42,9 @@ Following description about each atributes:
 
 **key:** Hotkey that will perform a quick access to command.
 
+Screenshots
+-----------
+
 License
 -------
 
