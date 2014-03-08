@@ -178,6 +178,12 @@ define(function (require, exports, module) {
         elem.animate({ scrollTop: elem[0].scrollHeight }, "slow");
     }
     
+    /**
+     * Retorna um array com os parametros do tipo $digito fornecido no comando.
+     * @param {string} command String do comando que podera ser executado.
+     * 
+     * @return Array com os paramentros fornecidos na stringo do comando.
+     */
     function getParams(command) {
         var re = /\$[0-9]+/g,
             matches = [],
@@ -194,6 +200,15 @@ define(function (require, exports, module) {
         return matches;
     }
     
+    /**
+     * Constroi o comando mesclando os parametros com o template da string do comando.
+     * @param {string} command String do comando que podera ser executado.
+     * @param {array} params Array que contem os parametros especificados na string do comando.
+     * @param {array} args Array de argumentos informados pelo usuario.
+     * @param {array} argsDefault Array de argumentos padrao informados no arquivo cmdrunner.json.
+     *
+     * @return String do comando meclado com os parametros pronto para ser executado.
+     */
     function buildCommand(command, params, args, argsDefault) {    
         for (var i = 0; i < params.length; i++) {
             var idx = parseInt(params[i]);
@@ -211,6 +226,28 @@ define(function (require, exports, module) {
     }
     
     /**
+     * Obtem as opcoes extras fornecidas para o comando meclando-as com as opcoes de execucao padrao.
+     * @return {object} Objeto que contem as informacoes extras para execucao do comando.
+     */
+    function getOpts(objCmd) {
+        var defaultOpts = {
+            defaultPath: ProjectManager.getProjectRoot().fullPath
+        };
+        
+        var opts = $.extend({}, defaultOpts, objCmd.opts);
+        
+        //TODO Melhorar!
+        if (opts.defaultPath 
+            && typeof opts.defaultPath == "string" 
+            && opts.defaultPath.length > 0 
+            && opts.defaultPath.charAt(0) === '.') {
+            opts.defaultPath = defaultOpts.defaultPath + '/' + opts.defaultPath;
+        }
+        
+        return opts;
+    }
+    
+    /**
      * Executa o comando fornecido e imprime a saida no painel.
      *
      * @param {object} objCmd Objeto que contem as informacoes do comando que sera executado.
@@ -218,15 +255,13 @@ define(function (require, exports, module) {
      * @param {DOMElem} btnClose Botao que fecha o painel de input de argumentos.
      */
     function runCommand(objCmd, args, btnClose) {
-        var opts = {
-            defaultPath: ProjectManager.getProjectRoot().fullPath
-        };
+        
         
         var command = buildCommand(objCmd.cmd, getParams(objCmd.cmd), args, objCmd.args);
 
         appendOutput('Executing: ' + command);
 
-        execCmdFnc(command, null, opts, function(err, data) {
+        execCmdFnc(command, null, getOpts(objCmd), function(err, data) {
             appendOutput(data, err ? 'red' : 'white');
             
             if (btnClose) {

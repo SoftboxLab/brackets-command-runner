@@ -18,4 +18,12 @@
     "cmd": "git archive --format zip -o brackets-command-runner.zip master",
     "args" : [],
     "key" : "Ctrl-Alt-Shift-Z"
+}, {
+    "label": "Show Current Dir",
+    "cmd": "pwd",
+    "args" : [],
+    "key" : "",
+    "opts": {
+        "defaultPath": "../"
+    }
 }]
