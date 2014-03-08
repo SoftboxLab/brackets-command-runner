@@ -45,6 +45,11 @@ Following description about each atributes:
 Screenshots
 -----------
 
+![Screenshot of quick open menu](https://raw.github.com/tarcisiojr/brackets-command-runner/screenshots/shot01.png)
+![Screenshot of output panel](https://raw.github.com/tarcisiojr/brackets-command-runner/screenshots/shot02.png)
+![Screenshot of input arguments](https://raw.github.com/tarcisiojr/brackets-command-runner/screenshots/shot03.png)
+
+
 License
 -------
 
