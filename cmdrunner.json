@@ -12,7 +12,7 @@
     "label": "Git Push",
     "cmd": "git push",
     "args" : [],
-    "key" : "Ctrl-Alt-Shift-P"
+    "key" : "Ctrl-Alt-Shift-W"
 }, {
     "label": "Generate Zip Package",
     "cmd": "git archive --format zip -o brackets-command-runner.zip master",

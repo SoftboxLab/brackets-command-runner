@@ -35,7 +35,9 @@ define(function (require, exports, module) {
     var DEBUG = true;   // Debug
     
     var cmdRunner = CommandManager.register("Open Command Runner", COMMAND_RUNNER, openSearch),
-        fileMenu  = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
+        fileMenu  = Menus.getMenu(Menus.AppMenuBar.FILE_MENU),
+        cmdsMenu  = Menus.addMenu('Commands', COMMAND_RUNNER + '-menu'),
+        regCount  = 0;
     
     var hotkeyPressed = false;
     
@@ -72,6 +74,10 @@ define(function (require, exports, module) {
             if (cmd.key) {
                 KeyBindingManager.removeBinding(cmd.key);
             }
+            
+            if (cmd.cmdID) {
+                cmdsMenu.removeMenuItem(cmd.cmdID);
+            }
         }
     }
     
@@ -107,11 +113,16 @@ define(function (require, exports, module) {
             for (var i = 0; i < cmdConfig.length; i++) {
                 var cmd = cmdConfig[i];
                 
+                cmd.cmdID = COMMAND_RUNNER + '.cmd-' + regCount++;
+
+                var cmdObj = CommandManager.register(cmd.label, cmd.cmdID, createCommand(cmd));
+
+                cmdsMenu.addMenuItem(cmdObj);
+                
                 if (cmd.key) {
-                    var cmdObj = CommandManager.register(cmd.label, COMMAND_RUNNER + '.cmd-' + i, createCommand(cmd));
-                    
-                    KeyBindingManager.addBinding(cmdObj, {key: cmd.key});                    
+                    KeyBindingManager.addBinding(cmdObj, {key: cmd.key});      
                 }
+                
             }
         } catch(err) {
             appendOutput('Erro ao carregar o arquivo cmdrunner.json: ' + err);
