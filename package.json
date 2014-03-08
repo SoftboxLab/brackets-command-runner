@@ -3,7 +3,7 @@
     "title": "Command Runner",
     "description": "Allow add dinamically hotkeys to execute console commands.",
     "homepage": "https://github.com/tarcisiojr/brackets-command-runner",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "author": "Tarcísio Abadio de Magalhães Júnior <tarcisiojunior@gmail.com>",
     "license": "MIT",
     "engines": {
