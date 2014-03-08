@@ -1,9 +1,9 @@
 {
-    "name": "tarcisio.command-runner",
+    "name": "tarcisio.brackets-command-runner",
     "title": "Command Runner",
     "description": "Add hotkeys for running command line tools.",
     "homepage": "https://github.com/tarcisiojr/brackets-command-runner",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "author": "Tarcísio Abadio de Magalhães Júnior <tarcisiojunior@gmail.com>",
     "license": "MIT",
     "engines": {
