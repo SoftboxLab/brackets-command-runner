@@ -28,7 +28,11 @@ The file cmdrunner.json is a JSON file that contains the configuration of comman
     
     "args": [ array ],
     
-    "key": "string"
+    "key": "string",
+    
+    "opts": {
+        "defaultPath": "string"
+    }
 }
 ```
 
@@ -42,13 +46,18 @@ Following description about each atributes:
 
 **key:** Hotkey that will perform a quick access to command.
 
+**opts:** Optional attribute, that configure some options of execution enviroment. 
+    
+**opts.defaultPath:** Path directory where command will executed.
+
+
 Screenshots
 -----------
 
 ![Screenshot of quick open menu](https://raw.github.com/tarcisiojr/brackets-command-runner/screenshots/shot01.png)
 ![Screenshot of output panel](https://raw.github.com/tarcisiojr/brackets-command-runner/screenshots/shot02.png)
 ![Screenshot of input arguments](https://raw.github.com/tarcisiojr/brackets-command-runner/screenshots/shot03.png)
-
+![Screenshot of commands menu](https://raw.github.com/tarcisiojr/brackets-command-runner/screenshots/shot04.png)
 
 License
 -------
