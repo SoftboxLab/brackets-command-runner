@@ -93,8 +93,7 @@ define(function (require, exports, module) {
     }
     
     /**
-     * Realiza o parse do arquivo de configuracao, remove todos os eventos associados anteriormente
-     * e por fim carregar as novas configuracoes.
+     * Realiza o parse do arquivo de configuracao e carrega as novas configuracoes.
      *
      * @param {string} cfgData String contendo as informacoes de configuracao.
      */
@@ -106,8 +105,6 @@ define(function (require, exports, module) {
                 return;                
             }
                                     
-            unbindAllHotkeys();
-            
             cmdConfig = cfg;
             
             for (var i = 0; i < cmdConfig.length; i++) {
@@ -131,11 +128,14 @@ define(function (require, exports, module) {
     }
     
     /**
-     * Carrega o arquivo de configuracao do executor de comandos.
+     * Inicialmente remove todos os eventos associados anteriormente e entao
+     * carrega o arquivo de configuracao do executor de comandos caso exita.
      */
     function readConfigFile() {
         var rootPath   = ProjectManager.getProjectRoot().fullPath,
             cmdCfgFile = FileSystem.getFileForPath(rootPath + 'cmdrunner.json');
+        
+        unbindAllHotkeys();
         
         FileUtils.readAsText(cmdCfgFile).done(function (rawText) {
             loadConfigs(rawText);

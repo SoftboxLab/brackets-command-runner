@@ -46,9 +46,9 @@ Following description about each atributes:
 
 **key:** Hotkey that will perform a quick access to command.
 
-**opts:** Optional attribute, that configure some options of execution enviroment. 
+**opts:** Optional attributes that configure some options of execution enviroment. 
     
-**opts.defaultPath:** Path directory where command will executed.
+**opts.defaultPath:** Directory path where command will executed.
 
 
 Screenshots
