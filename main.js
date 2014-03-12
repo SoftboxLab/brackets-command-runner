@@ -341,11 +341,6 @@ define(function (require, exports, module) {
 
         execCmdFnc(command, null, opts, function(err, data) {
             appendOutput(data, err ? 'red' : 'white');
-            
-            if (btnClose) {
-                // Fechar antes nao esta funcionado.... =(
-                btnClose.click();
-            }
         });
     }
     
@@ -359,8 +354,10 @@ define(function (require, exports, module) {
             var btnClose = $('.close', $('#brackets-cmd-runner-args'));
             
             btnClose.click(function() {
-                panelArgs.hide();
-                $(panelArgs).remove();
+                if (panelArgs) {
+                    $(panelArgs).hide();
+                    $(panelArgs).remove();                    
+                }
                 
                 panelArgs = null;
             });    
@@ -381,7 +378,7 @@ define(function (require, exports, module) {
                 if (evt.which === 13) {
                     btnClose.click();
                     
-                    runCommand(cmdSelected, $('#brackets-cmd-runner-args-val').val().split(':'), btnClose);
+                    runCommand(cmdSelected, $('#brackets-cmd-runner-args-val').val().split(':'));
                 }                
             });
         } 
