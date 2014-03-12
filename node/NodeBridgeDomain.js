@@ -92,8 +92,19 @@
         execConfis(options);
         
         var os       = require('os');
-        var spawn    = require('child_process').spawn;
-        var terminal = spawn(os.platform().toLowerCase().indexOf('linux') >= 0 ? 'bash' : 'cmd', args);
+        var spawn    = require('child_process').spawn;        
+        var osCmd    = 'bash';
+            
+        if (os.platform().toLowerCase().indexOf('linux') == -1) {
+            // No win: cmd /c start cmd.exe            
+            osCmd = 'cmd';
+            
+            args.push('/c');
+            args.push('start');
+            args.push('cmd.exe');
+        }
+    
+        var terminal = spawn(osCmd, args);
         
         commands[options.id] = terminal;
 

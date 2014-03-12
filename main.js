@@ -525,7 +525,7 @@ define(function (require, exports, module) {
                 
                 //if (DEBUG) alert("Erro cmd: " + JSON.stringify(err));
                 
-                appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' '));
+                appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' ') + ' Log: ' + err);
                 //appendOutput(data);
                 
                 //if (callback && typeof callback === 'function') {
