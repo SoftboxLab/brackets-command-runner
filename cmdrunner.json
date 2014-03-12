@@ -52,4 +52,9 @@
     "cmd": "while :; do echo 'Hit CTRL+C'; sleep 1; done",
     "args" : [],
     "key" : ""
+}, {
+    "label": "Open Firefox",
+    "cmd": "firefox 'http://$0'",
+    "args" : ["www.google.com.br"],
+    "key" : ""
 }]
