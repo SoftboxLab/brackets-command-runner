@@ -355,7 +355,7 @@ define(function (require, exports, module) {
             
             btnClose.click(function() {
                 if (panelArgs) {
-                    $(panelArgs).hide();
+                    panelArgs.hide();
                     $(panelArgs).remove();                    
                 }
                 
