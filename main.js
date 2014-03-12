@@ -23,6 +23,7 @@ define(function (require, exports, module) {
     
     // Id do plugin
     var COMMAND_RUNNER = "br.com.softbox.brackets.plugin.commandrunner";
+    var COMMAND_RUNNER_KILL = COMMAND_RUNNER + '.kill';
     
     var panelOutHtml  = require("text!html/panel_output.html");
     var panelArgsHtml = require("text!html/panel_args.html");
@@ -35,11 +36,39 @@ define(function (require, exports, module) {
     var DEBUG = true;   // Debug
     
     var cmdRunner = CommandManager.register("Open Command Runner", COMMAND_RUNNER, openSearch),
+        cmdKill   = CommandManager.register("Kill Commands", COMMAND_RUNNER_KILL, killCommands),
         fileMenu  = Menus.getMenu(Menus.AppMenuBar.FILE_MENU),
         cmdsMenu  = Menus.addMenu('Commands', COMMAND_RUNNER + '-menu'),
-        regCount  = 0;
+        regCount  = 0,
+        cmdId     = 0;
     
     var hotkeyPressed = false;
+    
+    var systemParams = {
+        selectedFile: function(opts) {
+            var doc = DocumentManager.getCurrentDocument();
+            
+            if (!doc) {
+                return '';
+            }
+            
+            //opts.defaultPath = doc.file.parentPath;
+            
+            return doc.file.name;
+        },
+        
+        dirOfSelectedFile: function(opts) {
+            var doc = DocumentManager.getCurrentDocument();
+            
+            if (!doc) {
+                return opts.defaultPath;
+            }
+            
+            //console.log(doc.file.parentPath);
+            
+            return doc.file.parentPath;
+        }
+    };
     
     /*$(document).keydown(function(evt) {
         if (hotkeyPressed 
@@ -54,11 +83,22 @@ define(function (require, exports, module) {
     var execCmdFnc = function(cmd, args, opts, callback) {
         alert('Can not run the command, because NodeJS bridge not loaded!');
     };
+    
+    var killCmdFnc = function() {
+        alert('Can not run kill command, because NodeJS bridge not loaded!');
+    }
         
     //fileMenu.addMenuDivider();
     fileMenu.addMenuItem(cmdRunner);
-        
+    
+    cmdsMenu.addMenuItem(cmdKill);
+    
     KeyBindingManager.addBinding(COMMAND_RUNNER, {key: "Ctrl-Shift-M"});
+    KeyBindingManager.addBinding(COMMAND_RUNNER_KILL, {key: "Ctrl-Shift-K"});
+    
+    function killCommands() {
+        killCmdFnc('nop');
+    }
     
     /**
      * Remove todas as hotkeys associadas.
@@ -118,8 +158,7 @@ define(function (require, exports, module) {
                 
                 if (cmd.key) {
                     KeyBindingManager.addBinding(cmdObj, {key: cmd.key});      
-                }
-                
+                }                
             }
         } catch(err) {
             appendOutput('Erro ao carregar o arquivo cmdrunner.json: ' + err);
@@ -171,7 +210,7 @@ define(function (require, exports, module) {
         
         var tmplate = [];
         
-        elem.append('<span style="color: ' + color + '">' + Mustache.render('{{row}}\n', {row: output}) + '</span>');            
+        elem.append('<span style="color: ' + color + '">' + Mustache.render('{{row}}', {row: output}) + '</span>');            
         
         panelOut.show();
         
@@ -209,7 +248,7 @@ define(function (require, exports, module) {
      *
      * @return String do comando meclado com os parametros pronto para ser executado.
      */
-    function buildCommand(command, params, args, argsDefault) {    
+    function buildCommand(command, params, args, argsDefault, opts) {    
         for (var i = 0; i < params.length; i++) {
             var idx = parseInt(params[i]);
             
@@ -219,7 +258,7 @@ define(function (require, exports, module) {
                 value = args[idx] ? args[idx] : (argsDefault[idx] ? argsDefault[idx] : '');
             }
             
-            command = command.replace(new RegExp('\\$' + params[i], 'g'), value);
+            command = command.replace(new RegExp('\\$' + params[i], 'g'), replaceSystemParams(value, opts));
         }
         
         return command;
@@ -244,7 +283,44 @@ define(function (require, exports, module) {
             opts.defaultPath = defaultOpts.defaultPath + '/' + opts.defaultPath;
         }
         
+        opts = replaceSystemParams(opts, opts);
+        
+        opts.id = cmdId++ + '';
+        
         return opts;
+    }
+    
+    function replaceSystemParams(command, opts) {
+        if (command == null) {
+            return null;
+        }
+        
+        if (typeof command === 'string') {
+            var newCommand = command;
+        
+            for (var param in systemParams) {
+
+                var paramValue = systemParams[param](opts);
+
+                while ((command = command.replace('$' + param, paramValue)) != newCommand) {
+                    newCommand = command;
+                }
+            }
+
+            return command;
+        }
+        
+        if (typeof command === 'object') {
+            var newCmd = command instanceof Array ? [] : {};
+            
+            for (var elem in command) {
+                newCmd[elem] = replaceSystemParams(command[elem], opts);
+            }
+            
+            return newCmd;
+        }    
+        
+        return command;
     }
     
     /**
@@ -255,13 +331,15 @@ define(function (require, exports, module) {
      * @param {DOMElem} btnClose Botao que fecha o painel de input de argumentos.
      */
     function runCommand(objCmd, args, btnClose) {
+        var opts = getOpts(objCmd);
         
+        var command = buildCommand(objCmd.cmd, getParams(objCmd.cmd), args, objCmd.args, opts);
         
-        var command = buildCommand(objCmd.cmd, getParams(objCmd.cmd), args, objCmd.args);
+        command = replaceSystemParams(command, opts);
 
-        appendOutput('Executing: ' + command);
+        appendOutput('Executing: ' + command + '\n');
 
-        execCmdFnc(command, null, getOpts(objCmd), function(err, data) {
+        execCmdFnc(command, null, opts, function(err, data) {
             appendOutput(data, err ? 'red' : 'white');
             
             if (btnClose) {
@@ -401,6 +479,16 @@ define(function (require, exports, module) {
         
         var nodeConnection = new NodeConnection();
         
+        $(nodeConnection).on("nodebridge.update", function(evt, data) {
+            var idx = data.indexOf(':');
+
+            var ret = data.substr(0, idx);
+
+            data = data.substr(idx + 1);
+            
+            appendOutput(data, ret === 'err' ? 'red' : 'white');
+        });
+        
         // Inicia a conexao com o NodeJS.
         function connect() {
             var connectionPromise = nodeConnection.connect(true);
@@ -446,19 +534,28 @@ define(function (require, exports, module) {
             });
             
             promise.done(function (data) {
-                if (callback && typeof callback === 'function') {
-                    var idx = data.indexOf(':');
-                    
-                    var ret = data.substr(0, idx);
-                    
-                    data = data.substr(idx + 1);
-                    
-                    callback(ret === 'err', data);
-                }
+                //funOutData(data);
             });
         }
         
+        function killCmd(id) {
+            var promise = nodeConnection.domains.nodebridge.killCmd(id);
+            
+            promise.fail(function (err, data) {
+                console.error("[brackets-tekton] kill execution: '", arguments);
+                
+                appendOutput('Error when executing kill command!', 'red');
+            });
+            
+            promise.done(function (data) {
+                appendOutput('Killed!');
+            });
+            
+            appendOutput('ok');
+        }
+        
         execCmdFnc = execCmd;
+        killCmdFnc = killCmd;
 
         chain(connect, loadBridge);
     });

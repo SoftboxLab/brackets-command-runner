@@ -31,4 +31,25 @@
     "opts": {
         "defaultPath": "./"
     }
+}, {
+    "label": "Show Current Dir Selected File",
+    "cmd": "pwd",
+    "args" : [],
+    "key" : "",
+    "opts": {
+        "defaultPath": "$dirOfSelectedFile"
+    }
+}, {
+    "label": "Echo File",
+    "cmd": "cat $selectedFile",
+    "args" : [],
+    "key" : "",
+    "opts": {
+        "defaultPath": "$dirOfSelectedFile"
+    }
+}, {
+    "label": "Infinite Loop",
+    "cmd": "while :; do echo 'Hit CTRL+C'; sleep 1; done",
+    "args" : [],
+    "key" : ""
 }]

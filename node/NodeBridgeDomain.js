@@ -4,6 +4,7 @@
     var domainManager = null;
 
     var fs = require('fs');
+    var commands = {};
 
     var LOG_FILE = '/tmp/nodebridge.log';
 
@@ -42,6 +43,7 @@
         }
     }
 
+    /*
     function execCmd(cmd, args, options, callback) {
         var exec = require('child_process').exec;
         var child;
@@ -58,18 +60,67 @@
 
             callback(false, (error ? 'err:' : 'ok:') + stdout + stderr);
         });
-
-        /*child.stdout.on("data", function (data) {
-            log('Data: ', data);
-
-            domainManager.emitEvent("nodeexec", "update", [data]);
-        });
+    }
+    */
+    
+    function killCmd(id) {
+        //TODO melhorar apenas para o comando de id fornecido.
         
-        child.stderr.on("data", function (data) {
-            log('Data: ', data);
+        var hasErr = false;
+        
+        for (var id in commands) {
+            log('Killing: ', id);
+            log('Killing connected: ', commands[id].connected);
+            
+            try {
+                commands[id].kill('SIGKILL');
 
-            domainManager.emitEvent("nodeexec", "update", [data]);
-        });*/
+                log('kill ok!');
+            } catch (err) {
+                log('Err kill', err);
+
+                hasErr = true;
+            }
+        }
+                    
+        return hasErr ? "err" : "ok";
+    }
+    
+    function execCmd(cmd, args, options, callback) {
+        args = args || [];
+
+        execConfis(options);
+        
+        var os       = require('os');
+        var spawn    = require('child_process').spawn;
+        var terminal = spawn(os.platform().toLowerCase().indexOf('linux') >= 0 ? 'bash' : 'cmd', args);
+        
+        commands[options.id] = terminal;
+
+        log('ExecCmd: ', cmd, args, options);
+
+        terminal.stdout.on("data", function (data) {
+            log('Data: ', '' + data);
+
+            domainManager.emitEvent("nodebridge", "update", ['ok:' + data]);
+        });
+
+        terminal.stderr.on("data", function (data) {
+            log('Data: ', data + '');
+
+            domainManager.emitEvent("nodebridge", "update", ['err:' + data]);
+        });
+
+        terminal.stdin.write(cmd);
+        terminal.stdin.end();
+
+        /* terminal.on('close', function(code) ->
+            stdout = stdout.replace(/^\s+|\s+$/g, '')
+            stdout = if stdout.length > 0 then stdout.split '\n' else []
+
+            stderr = stderr.replace(/^\s+|\s+$/g, '')
+            stderr = if stderr.length > 0 then stderr.split '\n' else []
+        }*/
     }
 
     function init(DomainManager) {
@@ -90,10 +141,23 @@
               type: "string",
               description: "Resultado da execução."}]
         );
+        
         domainManager.registerEvent(
             "nodebridge",
             "update",
             [{name: "data", type: "string"}]
+        );
+        
+        domainManager.registerCommand(
+            "nodebridge",
+            "killCmd",
+            killCmd,
+            true,
+            "Mata comandos já iniciados.",
+            ["id"],
+            [{name: "result",
+              type: "string",
+              description: "Resultado do comando kill execução."}]
         );
     }
 
