@@ -355,11 +355,8 @@ define(function (require, exports, module) {
             
             btnClose.click(function() {
                 if (panelArgs) {
-                    panelArgs.hide();
-                    $(panelArgs).remove();                    
-                }
-                
-                panelArgs = null;
+                    panelArgs.hide();                
+                }                
             });    
             
             var input = $('input', $('#brackets-cmd-runner-args'));
