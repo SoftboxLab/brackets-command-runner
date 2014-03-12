@@ -360,7 +360,7 @@ define(function (require, exports, module) {
             
             btnClose.click(function() {
                 panelArgs.hide();
-                panelArgs.remove();
+                $(panelArgs).remove();
                 
                 panelArgs = null;
             });    
@@ -379,6 +379,8 @@ define(function (require, exports, module) {
             
             input.keypress(function(evt) {
                 if (evt.which === 13) {
+                    btnClose.click();
+                    
                     runCommand(cmdSelected, $('#brackets-cmd-runner-args-val').val().split(':'), btnClose);
                 }                
             });
