@@ -38,7 +38,7 @@ define(function (require, exports, module) {
     var cmdRunner = CommandManager.register("Open Command Runner", COMMAND_RUNNER, openSearch),
         cmdKill   = CommandManager.register("Kill Commands", COMMAND_RUNNER_KILL, killCommands),
         fileMenu  = Menus.getMenu(Menus.AppMenuBar.FILE_MENU),
-        cmdsMenu  = Menus.addMenu('Commands', COMMAND_RUNNER + '-menu'),
+        cmdsMenu  = Menus.addMenu('Commands', COMMAND_RUNNER + '-menu', Menus.BEFORE, Menus.AppMenuBar.HELP_MENU),
         regCount  = 0,
         cmdId     = 0;
     
@@ -92,6 +92,18 @@ define(function (require, exports, module) {
     fileMenu.addMenuItem(cmdRunner);
     
     cmdsMenu.addMenuItem(cmdKill);
+    cmdsMenu.addMenuItem(CommandManager.register("Clear Console", COMMAND_RUNNER + '.clear.console', function() {
+        var elem = $('#brackets-cmd-runner-console').html('');
+    }));
+    cmdsMenu.addMenuItem(CommandManager.register("Show Console", COMMAND_RUNNER + '.show.console', function() {
+        appendOutput('');
+    }));
+    cmdsMenu.addMenuItem(CommandManager.register("Hide Console", COMMAND_RUNNER + '.hide.console', function() {
+        if (panelOut) {
+            panelOut.hide();
+        }
+    }));    
+    cmdsMenu.addMenuDivider();
     
     KeyBindingManager.addBinding(COMMAND_RUNNER, {key: "Ctrl-Shift-M"});
     KeyBindingManager.addBinding(COMMAND_RUNNER_KILL, {key: "Ctrl-Shift-K"});
@@ -547,7 +559,7 @@ define(function (require, exports, module) {
                 appendOutput('Killed!');
             });
             
-            appendOutput('ok');
+            appendOutput('Sent kill command.\n');
         }
         
         execCmdFnc = execCmd;
