@@ -44,29 +44,18 @@ define(function (require, exports, module) {
     
     var hotkeyPressed = false;
     
+    // Parametros do sistema.
     var systemParams = {
         selectedFile: function(opts) {
             var doc = DocumentManager.getCurrentDocument();
-            
-            if (!doc) {
-                return '';
-            }
-            
-            //opts.defaultPath = doc.file.parentPath;
-            
-            return doc.file.name;
+
+            return !doc ? '' : doc.file.name;
         },
         
         dirOfSelectedFile: function(opts) {
             var doc = DocumentManager.getCurrentDocument();
-            
-            if (!doc) {
-                return opts.defaultPath;
-            }
-            
-            //console.log(doc.file.parentPath);
-            
-            return doc.file.parentPath;
+
+            return !doc ? opts.defaultPath : doc.file.parentPath;
         }
     };
     
@@ -84,13 +73,14 @@ define(function (require, exports, module) {
         alert('Can not run the command, because NodeJS bridge not loaded!');
     };
     
+    // Funcao que executa o comando kill.
     var killCmdFnc = function() {
         alert('Can not run kill command, because NodeJS bridge not loaded!');
     }
         
     //fileMenu.addMenuDivider();
-    fileMenu.addMenuItem(cmdRunner);
-    
+    //fileMenu.addMenuItem(cmdRunner);
+    cmdsMenu.addMenuItem(cmdRunner);
     cmdsMenu.addMenuItem(cmdKill);
     cmdsMenu.addMenuItem(CommandManager.register("Clear Console", COMMAND_RUNNER + '.clear.console', function() {
         var elem = $('#brackets-cmd-runner-console').html('');
@@ -108,6 +98,9 @@ define(function (require, exports, module) {
     KeyBindingManager.addBinding(COMMAND_RUNNER, {key: "Ctrl-Shift-M"});
     KeyBindingManager.addBinding(COMMAND_RUNNER_KILL, {key: "Ctrl-Shift-K"});
     
+    /**
+     * Finaliza todos os comandos iniciados.
+     */
     function killCommands() {
         killCmdFnc('nop');
     }
@@ -135,6 +128,10 @@ define(function (require, exports, module) {
     
     /**
      * Cria uma funcao de evento para execucao de uma tecla de atalho.
+     *
+     * @param {object} cmd Comando que sera selecionado.
+     *
+     * @return {function} Funcao que executa a acao do comando selecionado.
      */
     function createCommand(cmd) {
         return function() {
@@ -205,8 +202,10 @@ define(function (require, exports, module) {
      * Adiciona o texto fornecido no painel inferior.
      *
      * @param {string} output String contendo o texto que sera adicionado ao painel de saida.
+     * @param {string} color Cor (nome cor, rgb) do texto que sera utilizada para exibicao.
+     * @param {bool} hiddenConsole True indica que o texto ser adicionado no painel, mas nao vai ser exibido.
      */
-    function appendOutput(output, color) {
+    function appendOutput(output, color, hiddenConsole) {
         if (!panelOut) {
             panelOut = PanelManager.createBottomPanel(COMMAND_RUNNER + '.output', $(panelOutHtml));
             
@@ -224,9 +223,11 @@ define(function (require, exports, module) {
         
         elem.append('<span style="color: ' + color + '">' + Mustache.render('{{row}}', {row: output}) + '</span>');            
         
-        panelOut.show();
+        if (!hiddenConsole) {
+            panelOut.show();
+        }
         
-        elem.animate({ scrollTop: elem[0].scrollHeight }, "slow");
+        elem.animate({ scrollTop: elem[0].scrollHeight }, "fast");
     }
     
     /**
@@ -253,10 +254,12 @@ define(function (require, exports, module) {
     
     /**
      * Constroi o comando mesclando os parametros com o template da string do comando.
+     *
      * @param {string} command String do comando que podera ser executado.
      * @param {array} params Array que contem os parametros especificados na string do comando.
      * @param {array} args Array de argumentos informados pelo usuario.
      * @param {array} argsDefault Array de argumentos padrao informados no arquivo cmdrunner.json.
+     * @param {object} opts Opcoes extras para a execucao do comando.
      *
      * @return String do comando meclado com os parametros pronto para ser executado.
      */
@@ -278,6 +281,9 @@ define(function (require, exports, module) {
     
     /**
      * Obtem as opcoes extras fornecidas para o comando meclando-as com as opcoes de execucao padrao.
+     *
+     * @param {object} objCmd Objeto que contem as informacoes do comando configurado no arquivo cmdrunner.json.
+     *
      * @return {object} Objeto que contem as informacoes extras para execucao do comando.
      */
     function getOpts(objCmd) {
@@ -302,6 +308,14 @@ define(function (require, exports, module) {
         return opts;
     }
     
+    /**
+     * Substitui as variaveis do comando fornecido pelos valores do sistema.
+     *
+     * @param {any} command Qualquer valor que se queira substituir pela vlaores do sistema.
+     * @param {object} opts Opcoes extras informadas para a execucao do comando.
+     * 
+     * @return {any} O objeto commando fornecido com as variaveis de sistema substituidas.
+     */
     function replaceSystemParams(command, opts) {
         if (command == null) {
             return null;
@@ -340,16 +354,15 @@ define(function (require, exports, module) {
      *
      * @param {object} objCmd Objeto que contem as informacoes do comando que sera executado.
      * @param {array} args Array com os argumentos fornecidos pelo usuario.
-     * @param {DOMElem} btnClose Botao que fecha o painel de input de argumentos.
      */
-    function runCommand(objCmd, args, btnClose) {
+    function runCommand(objCmd, args) {
         var opts = getOpts(objCmd);
         
         var command = buildCommand(objCmd.cmd, getParams(objCmd.cmd), args, objCmd.args, opts);
         
         command = replaceSystemParams(command, opts);
 
-        appendOutput('Executing: ' + command + '\n');
+        appendOutput('Executing: ' + command + '\n', null, opts.hiddenConsole);
 
         execCmdFnc(command, null, opts, function(err, data) {
             appendOutput(data, err ? 'red' : 'white');
@@ -357,7 +370,7 @@ define(function (require, exports, module) {
     }
     
     /** 
-     * Exibe paneil inferior para fornecer parametros para o comando.
+     * Exibe paneil inferior para fornecer parametros para a execucao do comando.
      */
     function showInputArgs() {
         if (!panelArgs) {
@@ -463,21 +476,20 @@ define(function (require, exports, module) {
         match: function(query) {
             return query.length > 0 && query.charAt(0) === '#';
         },
-        
-        //itemFocus: function () {},
-        
+                    
         itemSelect: function(item) {
             cmdSelected = item;
             
             showInputArgs();
         },
         
-        /*resultsFormatter: function(item) {
-            var displayName = highlightMatch(item);
-            return "<li>" + displayName + "</li>";
-        },*/
-        
         matcherOptions: { segmentedSearch: true }
+        
+        //itemFocus: function () {},
+        //resultsFormatter: function(item) {
+        //    var displayName = highlightMatch(item);
+        //    return "<li>" + displayName + "</li>";
+        //},
     });
     
 
@@ -487,14 +499,8 @@ define(function (require, exports, module) {
         
         var nodeConnection = new NodeConnection();
         
-        $(nodeConnection).on("nodebridge.update", function(evt, data) {
-            var idx = data.indexOf(':');
-
-            var ret = data.substr(0, idx);
-
-            data = data.substr(idx + 1);
-            
-            appendOutput(data, ret === 'err' ? 'red' : 'white');
+        $(nodeConnection).on("nodebridge.update", function(evt, ret) {
+            appendOutput(ret.data, ret.err ? 'red' : 'white', ret.hiddenConsole);
         });
         
         // Inicia a conexao com o NodeJS.
@@ -527,18 +533,18 @@ define(function (require, exports, module) {
         // Executa comando a atraves da bridge do NodeJS.
         function execCmd(cmd, args, options, callback, count) {
             if (!nodeConnection.domains.nodebridge) {
-		if (count > 5) {
-			appendOutput("Was not possible execute command '" + cmd + "' because NodeJS not started!\n");
-			return;
-		}
+                if (count > 5) {
+                    appendOutput("Was not possible execute command '" + cmd + "' because NodeJS not started!\n");
+                    return;
+                }
 	
-		appendOutput('Waiting for NodeJS..\n');
+		        appendOutput('Waiting for NodeJS..\n');
 			
                 setTimeout(function() {
                     execCmd.call(null, cmd, args, options, callback, (count || 1) + 1);
                 }, 1000);
-		
-		return;
+
+                return;
             }
             
             var promise = nodeConnection.domains.nodebridge.execCmd(cmd, args, options);
@@ -554,6 +560,7 @@ define(function (require, exports, module) {
             });
         }
         
+        // Mata os comandos atraves da bridge do NodeJS.
         function killCmd(id) {
             if (!nodeConnection.domains.nodebridge) {
                 return;

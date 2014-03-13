@@ -105,6 +105,7 @@
         }
     
         var terminal = spawn(osCmd, args);
+        var hiddenConsole = options.hiddenConsole || false;
         
         commands[options.id] = terminal;
 
@@ -113,13 +114,23 @@
         terminal.stdout.on("data", function (data) {
             log('Data: ', '' + data);
 
-            domainManager.emitEvent("nodebridge", "update", ['ok:' + data]);
+            domainManager.emitEvent("nodebridge", "update", [{
+                data: '' + data, 
+                err: false, 
+                id: options.id, 
+                hiddenConsole: hiddenConsole
+            }]);
         });
 
         terminal.stderr.on("data", function (data) {
             log('Data: ', data + '');
 
-            domainManager.emitEvent("nodebridge", "update", ['err:' + data]);
+            domainManager.emitEvent("nodebridge", "update", [{
+                data: '' + data, 
+                err: true, 
+                id: options.id,
+                hiddenConsole: hiddenConsole
+            }]);
         });
 
         terminal.stdin.write(cmd + '\n');
@@ -149,14 +160,14 @@
             "Executa o comandos com o Nodejs.",
             ["command", "args", "options"],
             [{name: "result",
-              type: "string",
+              type: "object",
               description: "Resultado da execução."}]
         );
         
         domainManager.registerEvent(
             "nodebridge",
             "update",
-            [{name: "data", type: "string"}]
+            [{name: "data", type: "object"}]
         );
         
         domainManager.registerCommand(

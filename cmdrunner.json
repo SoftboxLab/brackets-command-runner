@@ -49,9 +49,17 @@
     }
 }, {
     "label": "Infinite Loop",
-    "cmd": "while :; do echo 'Hit CTRL+C'; sleep 1; done",
+    "cmd": "while :; do echo 'Kill me!'; sleep 1; done",
     "args" : [],
     "key" : ""
+}, {
+    "label": "Loop Without Console",
+    "cmd": "while :; do echo 'Kill me!'; sleep 2; done",
+    "args" : [],
+    "key" : "",
+    "opts" : {
+        "hiddenConsole": true
+    }
 }, {
     "label": "Open Firefox",
     "cmd": "firefox 'http://$0'",
