@@ -38,7 +38,7 @@ The file cmdrunner.json is a JSON file that contains the configuration of comman
 }
 ```
 
-Following description about each atributes:
+Following is a description of each attribute:
 
 **label:** Label that show in menus and quick search.
 
