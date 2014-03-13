@@ -67,13 +67,19 @@ Change log
 ----------
 
 ## 0.0.12
-+ Specific menu "Commands"
-+ Kill commands menu option
-+ Show panel menu option
-+ Hide panel menu option
-+ Clear panel menu option
-+ Add extra option hiddenConsole.
-* Fix output update on panel output.
+
+Features:
+
+    - Specific menu "Commands"
+    - Kill commands menu option
+    - Show panel menu option
+    - Hide panel menu option
+    - Clear panel menu option
+    - Add extra option hiddenConsole.
+    
+Bugfixes:
+
+    - Fix output update on panel output.
 
 License
 -------
