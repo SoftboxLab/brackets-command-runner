@@ -5,28 +5,28 @@
 define(function (require, exports, module) {
     "use strict";
     
-    var AppInit             = brackets.getModule("utils/AppInit"),
-        ExtensionUtils      = brackets.getModule("utils/ExtensionUtils"),
-        NodeConnection      = brackets.getModule("utils/NodeConnection"),
-        NodeDomain          = brackets.getModule("utils/NodeDomain"),
-        CommandManager      = brackets.getModule("command/CommandManager"),
-        KeyBindingManager   = brackets.getModule("command/KeyBindingManager"),
-        Menus               = brackets.getModule("command/Menus"),
-        QuickOpen           = brackets.getModule("search/QuickOpen"),
-        ProjectManager      = brackets.getModule("project/ProjectManager"),
-        StatusBar           = brackets.getModule("widgets/StatusBar"),
-        FileSystem          = brackets.getModule("filesystem/FileSystem"),
-        FileUtils           = brackets.getModule("file/FileUtils"),
-        PanelManager        = brackets.getModule("view/PanelManager"),
+    var AppInit             = brackets.getModule('utils/AppInit'),
+        ExtensionUtils      = brackets.getModule('utils/ExtensionUtils'),
+        NodeConnection      = brackets.getModule('utils/NodeConnection'),
+        NodeDomain          = brackets.getModule('utils/NodeDomain'),
+        CommandManager      = brackets.getModule('command/CommandManager'),
+        KeyBindingManager   = brackets.getModule('command/KeyBindingManager'),
+        Menus               = brackets.getModule('command/Menus'),
+        QuickOpen           = brackets.getModule('search/QuickOpen'),
+        ProjectManager      = brackets.getModule('project/ProjectManager'),
+        StatusBar           = brackets.getModule('widgets/StatusBar'),
+        FileSystem          = brackets.getModule('filesystem/FileSystem'),
+        FileUtils           = brackets.getModule('file/FileUtils'),
+        PanelManager        = brackets.getModule('view/PanelManager'),
         Resizer             = brackets.getModule('utils/Resizer'),
-        DocumentManager     = brackets.getModule("document/DocumentManager");
+        DocumentManager     = brackets.getModule('document/DocumentManager');
     
     // Id do plugin
-    var COMMAND_RUNNER = "br.com.softbox.brackets.plugin.commandrunner";
+    var COMMAND_RUNNER = 'br.com.softbox.brackets.plugin.commandrunner';
     var COMMAND_RUNNER_KILL = COMMAND_RUNNER + '.kill';
     
-    var panelOutHtml  = require("text!html/panel_output.html");
-    var panelArgsHtml = require("text!html/panel_args.html");
+    var panelOutHtml  = require('text!html/panel_output.html');
+    var panelArgsHtml = require('text!html/panel_args.html');
     
     var panelOut,       // Painel de saida.
         panelArgs,      // Painel utilizado para entrada de argumentos.
@@ -35,8 +35,8 @@ define(function (require, exports, module) {
     
     var DEBUG = true;   // Debug
     
-    var cmdRunner = CommandManager.register("Open Command Runner", COMMAND_RUNNER, openSearch),
-        cmdKill   = CommandManager.register("Kill Commands", COMMAND_RUNNER_KILL, killCommands),
+    var cmdRunner = CommandManager.register('Open Command Runner', COMMAND_RUNNER, openSearch),
+        cmdKill   = CommandManager.register('Kill Commands', COMMAND_RUNNER_KILL, killCommands),
         fileMenu  = Menus.getMenu(Menus.AppMenuBar.FILE_MENU),
         cmdsMenu  = Menus.addMenu('Commands', COMMAND_RUNNER + '-menu', Menus.BEFORE, Menus.AppMenuBar.HELP_MENU),
         regCount  = 0,
@@ -82,21 +82,21 @@ define(function (require, exports, module) {
     //fileMenu.addMenuItem(cmdRunner);
     cmdsMenu.addMenuItem(cmdRunner);
     cmdsMenu.addMenuItem(cmdKill);
-    cmdsMenu.addMenuItem(CommandManager.register("Clear Console", COMMAND_RUNNER + '.clear.console', function() {
+    cmdsMenu.addMenuItem(CommandManager.register('Clear Console', COMMAND_RUNNER + '.clear.console', function() {
         var elem = $('#brackets-cmd-runner-console').html('');
     }));
-    cmdsMenu.addMenuItem(CommandManager.register("Show Console", COMMAND_RUNNER + '.show.console', function() {
+    cmdsMenu.addMenuItem(CommandManager.register('Show Console', COMMAND_RUNNER + '.show.console', function() {
         appendOutput('');
     }));
-    cmdsMenu.addMenuItem(CommandManager.register("Hide Console", COMMAND_RUNNER + '.hide.console', function() {
+    cmdsMenu.addMenuItem(CommandManager.register('Hide Console', COMMAND_RUNNER + '.hide.console', function() {
         if (panelOut) {
             panelOut.hide();
         }
     }));    
     cmdsMenu.addMenuDivider();
     
-    KeyBindingManager.addBinding(COMMAND_RUNNER, {key: "Ctrl-Shift-M"});
-    KeyBindingManager.addBinding(COMMAND_RUNNER_KILL, {key: "Ctrl-Shift-K"});
+    KeyBindingManager.addBinding(COMMAND_RUNNER, {key: 'Ctrl-Shift-M'});
+    KeyBindingManager.addBinding(COMMAND_RUNNER_KILL, {key: 'Ctrl-Shift-K'});
     
     /**
      * Finaliza todos os comandos iniciados.
@@ -192,7 +192,7 @@ define(function (require, exports, module) {
     
     // Eventos que determinam a carga do arquivo de configuracao do cmd runner.
     $(ProjectManager).on('projectOpen projectRefresh', readConfigFile);
-    $(DocumentManager).on("documentSaved", function(evt, doc) {
+    $(DocumentManager).on('documentSaved', function(evt, doc) {
         if (doc.file.name == 'cmdrunner.json') {
             readConfigFile();
         }
@@ -227,7 +227,7 @@ define(function (require, exports, module) {
             panelOut.show();
         }
         
-        elem.animate({ scrollTop: elem[0].scrollHeight }, "fast");
+        elem.animate({ scrollTop: elem[0].scrollHeight }, 'fast');
     }
     
     /**
@@ -295,7 +295,7 @@ define(function (require, exports, module) {
         
         //TODO Melhorar!
         if (opts.defaultPath 
-            && typeof opts.defaultPath == "string" 
+            && typeof opts.defaultPath == 'string' 
             && opts.defaultPath.length > 0 
             && opts.defaultPath.charAt(0) === '.') {
             opts.defaultPath = defaultOpts.defaultPath + '/' + opts.defaultPath;
@@ -431,7 +431,7 @@ define(function (require, exports, module) {
      * Abre o paneil de busca de comandos.
      */
     function openSearch() {
-        QuickOpen.beginSearch("#", "");
+        QuickOpen.beginSearch('#', '');
         
         hotkeyPressed = true;
         
@@ -457,8 +457,8 @@ define(function (require, exports, module) {
     }
     
     QuickOpen.addQuickOpenPlugin({
-        name: "Command Runner",
-        label: "Command Runner",  // ignored before Sprint 34
+        name: 'Command Runner',
+        label: 'Command Runner',  // ignored before Sprint 34
         languageIds: [],  // empty array = all file types  (Sprint 23+)
         fileTypes:   [],  // (< Sprint 23)
         done: function () {},
@@ -495,11 +495,11 @@ define(function (require, exports, module) {
 
     // Inicia conexao com NodeJS
     AppInit.appReady(function () {
-        var path = ExtensionUtils.getModulePath(module, "node/NodeBridgeDomain");
+        var path = ExtensionUtils.getModulePath(module, 'node/NodeBridgeDomain');
         
         var nodeConnection = new NodeConnection();
         
-        $(nodeConnection).on("nodebridge.update", function(evt, ret) {
+        $(nodeConnection).on('nodebridge.update', function(evt, ret) {
             appendOutput(ret.data, ret.err ? 'red' : 'white', ret.hiddenConsole);
         });
         
@@ -508,8 +508,8 @@ define(function (require, exports, module) {
             var connectionPromise = nodeConnection.connect(true);
             
             connectionPromise.fail(function (err) {
-                console.error("[brackets-tekton] failed to connect to node: ", err);
-                if (DEBUG) alert("Erro connect: " + JSON.stringify(err));
+                console.error('[brackets-tekton] failed to connect to node: ', err);
+                if (DEBUG) alert('Erro connect: ' + JSON.stringify(err));
             });
             
             return connectionPromise;
@@ -517,14 +517,14 @@ define(function (require, exports, module) {
         
         // Inicia a bridge que executara os comandos
         function loadBridge() {
-            var path = ExtensionUtils.getModulePath(module, "node/NodeBridgeDomain");
+            var path = ExtensionUtils.getModulePath(module, 'node/NodeBridgeDomain');
             
             var loadPromise = nodeConnection.loadDomains([path], true);
             
             loadPromise.fail(function (err) {
-                console.log("[brackets-tekton] failed to load domain: ", err);
+                console.log('[brackets-tekton] failed to load domain: ', err);
                 
-                if (DEBUG) alert("Erro loadBridge: " + JSON.stringify(err));
+                if (DEBUG) alert('Erro loadBridge: ' + JSON.stringify(err));
             });
             
             return loadPromise;
@@ -534,7 +534,7 @@ define(function (require, exports, module) {
         function execCmd(cmd, args, options, callback, count) {
             if (!nodeConnection.domains.nodebridge) {
                 if (count > 5) {
-                    appendOutput("Was not possible execute command '" + cmd + "' because NodeJS not started!\n");
+                    appendOutput('Was not possible execute command ' + cmd + ' because NodeJS not started!\n');
                     return;
                 }
 	
@@ -550,7 +550,7 @@ define(function (require, exports, module) {
             var promise = nodeConnection.domains.nodebridge.execCmd(cmd, args, options);
             
             promise.fail(function (err, data) {
-                console.error("[brackets-tekton] execution: '", arguments);
+                console.error('[brackets-tekton] execution: ', arguments);
 
                 appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' ') + ' Log: ' + err);
             });
@@ -569,7 +569,7 @@ define(function (require, exports, module) {
             var promise = nodeConnection.domains.nodebridge.killCmd(id);
             
             promise.fail(function (err, data) {
-                console.error("[brackets-tekton] kill execution: '", arguments);
+                console.error('[brackets-tekton] kill execution: ', arguments);
                 
                 appendOutput('Error when executing kill command!', 'red');
             });
