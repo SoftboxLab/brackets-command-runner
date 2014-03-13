@@ -31,7 +31,9 @@ The file cmdrunner.json is a JSON file that contains the configuration of comman
     "key": "string",
     
     "opts": {
-        "defaultPath": "string"
+        "defaultPath": "string",
+        
+        "hiddenConsole": bool
     }
 }
 ```
@@ -50,6 +52,7 @@ Following description about each atributes:
     
 **opts.defaultPath:** Directory path where command will executed.
 
+**opts.hiddenConsole:** True indicates that output panel will not open after command execution.
 
 Screenshots
 -----------
@@ -58,6 +61,19 @@ Screenshots
 ![Screenshot of output panel](https://raw.github.com/tarcisiojr/brackets-command-runner/screenshots/shot02.png)
 ![Screenshot of input arguments](https://raw.github.com/tarcisiojr/brackets-command-runner/screenshots/shot03.png)
 ![Screenshot of commands menu](https://raw.github.com/tarcisiojr/brackets-command-runner/screenshots/shot04.png)
+
+
+Change log
+----------
+
+## 0.0.12
++ Specific menu "Commands"
++ Kill commands menu option
++ Show panel menu option
++ Hide panel menu option
++ Clear panel menu option
++ Add extra option hiddenConsole.
+* Fix output update on panel output.
 
 License
 -------
