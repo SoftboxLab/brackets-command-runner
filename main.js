@@ -526,19 +526,26 @@ define(function (require, exports, module) {
         
         // Executa comando a atraves da bridge do NodeJS.
         function execCmd(cmd, args, options, callback) {
+            if (!nodeConnection.domains.nodebridge) {
+				if (count > 5) {
+					appendOutput("Was not possible execute command '" + cmd + "' because NodeJS not started!\n");
+					return;
+				}
+			
+				appendOutput('Waiting for NodeJS..\n');
+			
+                setTimeout(function() {
+                    execCmd.call(null, cmd, args, options, callback, (count || 1) + 1);
+                }, 1000);
+				return;
+            }
+            
             var promise = nodeConnection.domains.nodebridge.execCmd(cmd, args, options);
             
             promise.fail(function (err, data) {
                 console.error("[brackets-tekton] execution: '", arguments);
-                
-                //if (DEBUG) alert("Erro cmd: " + JSON.stringify(err));
-                
+
                 appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' ') + ' Log: ' + err);
-                //appendOutput(data);
-                
-                //if (callback && typeof callback === 'function') {
-                //    callback(err, data);
-                //}
             });
             
             promise.done(function (data) {
@@ -547,6 +554,10 @@ define(function (require, exports, module) {
         }
         
         function killCmd(id) {
+            if (!nodeConnection.domains.nodebridge) {
+                return;
+            }
+            
             var promise = nodeConnection.domains.nodebridge.killCmd(id);
             
             promise.fail(function (err, data) {
