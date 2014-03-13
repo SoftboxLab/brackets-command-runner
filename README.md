@@ -84,4 +84,4 @@ Bugfixes:
 License
 -------
 
-Theseus is released under the [MIT license](http://opensource.org/licenses/MIT).
+Command Runner is released under the [MIT license](http://opensource.org/licenses/MIT).

@@ -65,4 +65,9 @@
     "cmd": "firefox 'http://$0'",
     "args" : ["www.google.com.br"],
     "key" : ""
+}, {
+    "label": "Commit And Push",
+    "cmd": "git commit -a -m '$0' && git push",
+    "args" : ["Updates..."],
+    "key" : ""
 }]
