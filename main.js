@@ -525,19 +525,20 @@ define(function (require, exports, module) {
         }
         
         // Executa comando a atraves da bridge do NodeJS.
-        function execCmd(cmd, args, options, callback) {
+        function execCmd(cmd, args, options, callback, count) {
             if (!nodeConnection.domains.nodebridge) {
-				if (count > 5) {
-					appendOutput("Was not possible execute command '" + cmd + "' because NodeJS not started!\n");
-					return;
-				}
-			
-				appendOutput('Waiting for NodeJS..\n');
+		if (count > 5) {
+			appendOutput("Was not possible execute command '" + cmd + "' because NodeJS not started!\n");
+			return;
+		}
+	
+		appendOutput('Waiting for NodeJS..\n');
 			
                 setTimeout(function() {
                     execCmd.call(null, cmd, args, options, callback, (count || 1) + 1);
                 }, 1000);
-				return;
+		
+		return;
             }
             
             var promise = nodeConnection.domains.nodebridge.execCmd(cmd, args, options);
