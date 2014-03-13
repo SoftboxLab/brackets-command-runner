@@ -99,9 +99,9 @@
             // No win: cmd /c start cmd.exe            
             osCmd = 'cmd';
             
-            args.push('/c');
-            args.push('start');
-            args.push('cmd.exe');
+            args.push('/K');
+            //args.push('start');
+            //args.push('cmd.exe');
         }
     
         var terminal = spawn(osCmd, args);
@@ -122,7 +122,7 @@
             domainManager.emitEvent("nodebridge", "update", ['err:' + data]);
         });
 
-        terminal.stdin.write(cmd);
+        terminal.stdin.write(cmd + '\n');
         terminal.stdin.end();
 
         /* terminal.on('close', function(code) ->
