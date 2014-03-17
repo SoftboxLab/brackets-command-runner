@@ -1,5 +1,5 @@
 [{
-    "label": "Git Status",
+    "label": "Git Status Cmd",
     "cmd": "git status",
     "args" : [],
     "key" : "Ctrl-Alt-Shift-S"
