@@ -1,5 +1,5 @@
 [{
-    "label": "Git Status Cmd",
+    "label": "Git Status ",
     "cmd": "git status",
     "args" : [],
     "key" : "Ctrl-Alt-Shift-S"
@@ -71,7 +71,7 @@
     "args" : ["Updates..."],
     "key" : ""
 }, {
-    "label": "New Commit And Push",
+    "label": "New Commit And Push 2",
     "cmd": "git commit -a -m '$0' && git push",
     "args" : ["Updates..."],
     "key" : ""
