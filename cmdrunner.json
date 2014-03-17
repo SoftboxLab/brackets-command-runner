@@ -71,7 +71,7 @@
     "args" : ["Updates..."],
     "key" : ""
 }, {
-    "label": "New Commit And Push",
+    "label": "New Commit Push",
     "cmd": "git commit -a -m '$0' && git push",
     "args" : ["Updates..."],
     "key" : ""
