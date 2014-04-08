@@ -66,6 +66,11 @@ Screenshots
 Change log
 ----------
 
+## 0.0.13
+
+Features:
+    - Color on output (thanks for partageit suggestion).
+
 ## 0.0.12
 
 Features:
