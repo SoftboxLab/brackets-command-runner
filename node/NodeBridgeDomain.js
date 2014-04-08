@@ -73,7 +73,12 @@
             log('Killing connected: ', commands[id].connected);
             
             try {
-                commands[id].kill('SIGKILL');
+                commands[id].stdin.write('\x04');
+                commands[id].stdin.write('\n');
+                commands[id].stdin.write('\x04');
+                commands[id].stdin.write('\n');
+                commands[id].stdin.end();
+                commands[id].kill();
 
                 log('kill ok!');
             } catch (err) {
@@ -134,7 +139,7 @@
         });
 
         terminal.stdin.write(cmd + '\n');
-        terminal.stdin.end();
+        
 
         /* terminal.on('close', function(code) ->
             stdout = stdout.replace(/^\s+|\s+$/g, '')

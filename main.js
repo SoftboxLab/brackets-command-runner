@@ -21,6 +21,8 @@ define(function (require, exports, module) {
         Resizer             = brackets.getModule('utils/Resizer'),
         DocumentManager     = brackets.getModule('document/DocumentManager');
     
+    var ansi2html = require('ansi2html');
+    
     // Id do plugin
     var COMMAND_RUNNER = 'br.com.softbox.brackets.plugin.commandrunner';
     var COMMAND_RUNNER_KILL = COMMAND_RUNNER + '.kill';
@@ -221,7 +223,7 @@ define(function (require, exports, module) {
         
         var tmplate = [];
         
-        elem.append('<span style="color: ' + color + '">' + Mustache.render('{{row}}', {row: output}) + '</span>');            
+        elem.append('<span style="color: ' + color + '">' + ansi2html(Mustache.render('{{row}}', {row: output})) + '</span>');            
         
         if (!hiddenConsole) {
             panelOut.show();
@@ -499,6 +501,8 @@ define(function (require, exports, module) {
         
         var nodeConnection = new NodeConnection();
         
+        var startNodeTimeout = 0;
+        
         $(nodeConnection).on('nodebridge.update', function(evt, ret) {
             appendOutput(ret.data, ret.err ? 'red' : 'white', ret.hiddenConsole);
         });
@@ -533,14 +537,16 @@ define(function (require, exports, module) {
         // Executa comando a atraves da bridge do NodeJS.
         function execCmd(cmd, args, options, callback, count) {
             if (!nodeConnection.domains.nodebridge) {
-                if (count > 5) {
+                clearTimeout(startNodeTimeout);
+                
+                if (count > 10) {                    
                     appendOutput('Was not possible execute command ' + cmd + ' because NodeJS not started!\n');
                     return;
                 }
-	
-		        appendOutput('Waiting for NodeJS..\n');
+                
+		        appendOutput('Waiting for NodeJS...\n');
 			
-                setTimeout(function() {
+                startNodeTimeout = setTimeout(function() {
                     execCmd.call(null, cmd, args, options, callback, (count || 1) + 1);
                 }, 1000);
 
