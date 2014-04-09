@@ -33,7 +33,9 @@ The file cmdrunner.json is a JSON file that contains the configuration of comman
     "opts": {
         "defaultPath": "string",
         
-        "hiddenConsole": bool
+        "hiddenConsole": bool,
+        
+        "killCmd": "string"
     }
 }
 ```
@@ -54,6 +56,8 @@ Following is a description of each attribute:
 
 **opts.hiddenConsole:** True indicates that output panel will not open after command execution.
 
+**opts.killCmd:** Command that will be triggered by 'Kill Commands' menu option.
+
 Screenshots
 -----------
 
@@ -65,6 +69,13 @@ Screenshots
 
 Change log
 ----------
+
+## 0.0.14
+
+Features:
+
+    - Add killCmd option on configuration.
+
 
 ## 0.0.13
 

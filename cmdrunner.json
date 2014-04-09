@@ -79,7 +79,10 @@
     "label": "Run Jboss",
     "cmd": "~/Develop/jboss-6.1.0.eldoc/bin/run.sh",
     "args" : [],
-    "key": ""
+    "key": "",
+    "opts": {
+        "killCmd": "~/Develop/jboss-6.1.0.eldoc/bin/shutdown.sh -S"
+    }
 }, {
     "label": "Echo With Color",
     "cmd" : "echo -e \"\\e[31mHello World\\e[0m\"",
