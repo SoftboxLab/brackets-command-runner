@@ -116,11 +116,11 @@
         execConfis(options);
         
         var os       = require('os');
-        var spawn    = require('child_process').spawn;        
-        var osCmd    = 'bash';
-            
-        if (os.platform().toLowerCase().indexOf('linux') == -1) {
-            // No win: cmd /c start cmd.exe            
+        var spawn    = require('child_process').spawn;
+        var osCmd    = 'bash';    // *nix systems (eg. osx, linux)
+
+        if (/^win/.test(os.platform())) {
+            // No win: cmd /c start cmd.exe
             osCmd = 'cmd';
             
             args.push('/K');
