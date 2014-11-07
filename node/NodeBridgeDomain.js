@@ -1,16 +1,16 @@
 (function () {
     "use strict";
-    
+
     var fs = require('fs');
-    
+
     var domainManager = null;
-    
+
     // Comandos executados pelo usuario
     var commands = {};
 
     // Log de debug
     var LOG_FILE = '/tmp/nodebridge.log';
-    
+
     // Habilita info de debug.
     var DEBUG = false;
 
@@ -19,14 +19,14 @@
      */
     function log() {
         var elems = Array.prototype.splice.call(arguments, 0);
-        
+
         var arrLog = [];
 
         elems.forEach(function(elem) {
             var msg = elem;
 
             if (typeof elem !== 'string') {
-                msg = JSON.stringify(elem);     
+                msg = JSON.stringify(elem);
             }
 
             arrLog.push(msg);
@@ -34,7 +34,7 @@
 
         DEBUG && fs.appendFile(LOG_FILE, arrLog.join(' ') + '\n');
     }
-    
+
     /**
      * Executa as configuracoes do abiente de acordo com as opcoes fornecidas no comando.
      */
@@ -42,7 +42,7 @@
         if (!options) {
             return;
         }
-        
+
         // Alteracoes de diretorio corrente.
         if (options.defaultPath) {
             try {
@@ -57,7 +57,7 @@
             LOG_FILE = options.logFile;
         }
     }
-    
+
     /**
      * Executa o kill para todos os processo em execucao.
      *
@@ -65,70 +65,72 @@
      */
     function killCmd(id) {
         //TODO melhorar apenas para o comando de id fornecido.
-        
+
         var hasErr = false;
-        
+
         for (var id in commands) {
             // Nao executa o kill dos comandos kill.
             if (id.match(/-kill$/ig)) {
                 log('Ignore kill', id);
                 continue;
             }
-            
+
             var terminal = commands[id].terminal;
-            
+
             log('Killing: ', id);
-            
+
             try {
                 terminal.kill();
-                
+
                 log('Send kill ok!');
-                
-                if (commands[id].opts.killCmd) {             
+
+                if (commands[id].opts.killCmd) {
                     // Clonando as opcoes do comando original.
                     var killOpts = JSON.parse(JSON.stringify(commands[id].opts));
-                    
+
                     killOpts.id = killOpts.id + '-kill';
-                    
+
                     // Enviando comando de kill informado pelo usuario.
                     execCmd(commands[id].opts.killCmd, null, killOpts);
-                }                
+                }
             } catch (err) {
                 log('Err kill', err);
 
                 hasErr = true;
             }
         }
-                    
+
         return hasErr ? "err" : "ok";
     }
-    
+
     /**
      * Realiza a execucao do comando informado.
      *
      * @param cmd {string} Comando que sera executado.
      * @param args {array} Argumentos necessarios para a execucao do comando.
-     * @param optios {object} Opcoes de configuracao do ambiente de execucacao.     
+     * @param optios {object} Opcoes de configuracao do ambiente de execucacao.
      */
     function execCmd(cmd, args, options, callback) {
         args = args || [];
 
         execConfis(options);
-        
+
         var os       = require('os');
-        var spawn    = require('child_process').spawn;        
-        var osCmd    = 'bash';
-            
-        if (os.platform().toLowerCase().indexOf('linux') == -1) {
-            // No win: cmd /c start cmd.exe            
+        var spawn    = require('child_process').spawn;
+        var osCmd    = 'bash';    // *nix systems (eg. osx, linux)
+
+        if (/^win/.test(os.platform())) {
+            // No win: cmd /c start cmd.exe
             osCmd = 'cmd';
-            
+
             args.push('/K');
+        } else {
+            args.push('-l');
         }
-    
+
         var terminal = spawn(osCmd, args);
         var hiddenConsole = options.hiddenConsole || false;
-        
+
         commands[options.id] = {
             terminal: terminal,
             opts: options
@@ -140,9 +142,9 @@
             log('Data: ', '' + data);
 
             domainManager.emitEvent("nodebridge", "update", [{
-                data: '' + data, 
-                err: false, 
-                id: options.id, 
+                data: '' + data,
+                err: false,
+                id: options.id,
                 hiddenConsole: hiddenConsole
             }]);
         });
@@ -151,8 +153,8 @@
             log('Data: ', data + '');
 
             domainManager.emitEvent("nodebridge", "update", [{
-                data: '' + data, 
-                err: true, 
+                data: '' + data,
+                err: true,
                 id: options.id,
                 hiddenConsole: hiddenConsole
             }]);
