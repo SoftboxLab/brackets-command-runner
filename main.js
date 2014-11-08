@@ -58,6 +58,12 @@ define(function (require, exports, module) {
             var doc = DocumentManager.getCurrentDocument();
 
             return !doc ? opts.defaultPath : doc.file.parentPath;
+        },
+
+        projectDir: function(opts) {
+            var dir = ProjectManager.getProjectRoot();
+
+            return dir ? dir.fullPath : '.';
         }
     };
 

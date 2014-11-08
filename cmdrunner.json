@@ -5,7 +5,7 @@
     "key" : "Ctrl-Alt-Shift-S"
 },{
     "label": "Curl ",
-    "cmd": "curl $0 $1",
+    "cmd": "curl '$projectDir'",
     "args" : [],
     "splitChar": "|",
     "key" : ""

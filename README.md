@@ -44,7 +44,7 @@ Following is a description of each attribute:
 
 **label:** Label that show in menus and quick search.
 
-**cmd:** Command that will be executed. You can use $0, $1, ... $n to specify custom arguments, that will be propted for user.
+**cmd:** Command that will be executed. You can use $0, $1, ... $n to specify custom arguments, that will be prompted for user.
 
 **args:** Array that contains default arguments, in case user supply anything.
 
@@ -52,13 +52,23 @@ Following is a description of each attribute:
 
 **splitChar:** Specify the char that will separate arguments of command. Default value is ':'.
 
-**opts:** Optional attributes that configure some options of execution enviroment.
+**opts:** Optional attributes that configure some options of execution environment.
 
 **opts.defaultPath:** Directory path where command will executed.
 
 **opts.hiddenConsole:** True indicates that output panel will not open after command execution.
 
 **opts.killCmd:** Command that will be triggered by 'Kill Commands' menu option.
+
+
+
+System Parameters: Reserved variables that can be used to compose commands.
+
+**$selectedFile** Path to selected file.
+
+**$dirOfSelectedFile** Path to directory of selected file.
+
+**$projectDir** Path directory of project.
 
 Screenshots
 -----------
