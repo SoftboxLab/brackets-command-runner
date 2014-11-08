@@ -3,6 +3,12 @@
     "cmd": "git status",
     "args" : [],
     "key" : "Ctrl-Alt-Shift-S"
+},{
+    "label": "Curl ",
+    "cmd": "curl $0 $1",
+    "args" : [],
+    "splitChar": "|",
+    "key" : ""
 }, {
     "label": "Git Commit All",
     "cmd": "git commit -a -m '$0'",

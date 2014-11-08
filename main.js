@@ -4,7 +4,7 @@
 // Bracket extension. Permite que o desenvolvedor crie atalhos para os comandos de console.
 define(function (require, exports, module) {
     "use strict";
-    
+
     var AppInit             = brackets.getModule('utils/AppInit'),
         ExtensionUtils      = brackets.getModule('utils/ExtensionUtils'),
         NodeConnection      = brackets.getModule('utils/NodeConnection'),
@@ -20,32 +20,32 @@ define(function (require, exports, module) {
         PanelManager        = brackets.getModule('view/PanelManager'),
         Resizer             = brackets.getModule('utils/Resizer'),
         DocumentManager     = brackets.getModule('document/DocumentManager');
-    
+
     var ansi2html = require('ansi2html');
-    
+
     // Id do plugin
     var COMMAND_RUNNER = 'br.com.softbox.brackets.plugin.commandrunner';
     var COMMAND_RUNNER_KILL = COMMAND_RUNNER + '.kill';
-    
+
     var panelOutHtml  = require('text!html/panel_output.html');
     var panelArgsHtml = require('text!html/panel_args.html');
-    
+
     var panelOut,       // Painel de saida.
         panelArgs,      // Painel utilizado para entrada de argumentos.
         cmdConfig,      // Configuracoes do projeto.
         cmdSelected;    // Comando corrente selecionado.
-    
+
     var DEBUG = true;   // Debug
-    
+
     var cmdRunner = CommandManager.register('Open Command Runner', COMMAND_RUNNER, openSearch),
         cmdKill   = CommandManager.register('Kill Commands', COMMAND_RUNNER_KILL, killCommands),
         fileMenu  = Menus.getMenu(Menus.AppMenuBar.FILE_MENU),
         cmdsMenu  = Menus.addMenu('Commands', COMMAND_RUNNER + '-menu', Menus.BEFORE, Menus.AppMenuBar.HELP_MENU),
         regCount  = 0,
         cmdId     = 0;
-    
+
     var hotkeyPressed = false;
-    
+
     // Parametros do sistema.
     var systemParams = {
         selectedFile: function(opts) {
@@ -53,33 +53,33 @@ define(function (require, exports, module) {
 
             return !doc ? '' : doc.file.name;
         },
-        
+
         dirOfSelectedFile: function(opts) {
             var doc = DocumentManager.getCurrentDocument();
 
             return !doc ? opts.defaultPath : doc.file.parentPath;
         }
     };
-    
+
     /*$(document).keydown(function(evt) {
-        if (hotkeyPressed 
-                && evt.shiftKey 
+        if (hotkeyPressed
+                && evt.shiftKey
                 && evt.ctrlKey
                 && String.fromCharCode(evt.which).toUpperCase() == 'K') {
-            
+
         }
     });*/
-    
+
     // Funcao que executa comandos atraves do NodeJS
     var execCmdFnc = function(cmd, args, opts, callback) {
         alert('Can not run the command, because NodeJS bridge not loaded!');
     };
-    
+
     // Funcao que executa o comando kill.
     var killCmdFnc = function() {
         alert('Can not run kill command, because NodeJS bridge not loaded!');
     }
-        
+
     //fileMenu.addMenuDivider();
     //fileMenu.addMenuItem(cmdRunner);
     cmdsMenu.addMenuItem(cmdRunner);
@@ -94,19 +94,19 @@ define(function (require, exports, module) {
         if (panelOut) {
             panelOut.hide();
         }
-    }));    
+    }));
     cmdsMenu.addMenuDivider();
-    
+
     KeyBindingManager.addBinding(COMMAND_RUNNER, {key: 'Ctrl-Shift-M'});
     KeyBindingManager.addBinding(COMMAND_RUNNER_KILL, {key: 'Ctrl-Shift-K'});
-    
+
     /**
      * Finaliza todos os comandos iniciados.
      */
     function killCommands() {
         killCmdFnc('nop');
     }
-    
+
     /**
      * Remove todas as hotkeys associadas.
      */
@@ -114,20 +114,20 @@ define(function (require, exports, module) {
         if (!cmdConfig) {
             return;
         }
-        
+
         for (var i = 0; i < cmdConfig.length; i++) {
             var cmd = cmdConfig[i];
 
             if (cmd.key) {
                 KeyBindingManager.removeBinding(cmd.key);
             }
-            
+
             if (cmd.cmdID) {
                 cmdsMenu.removeMenuItem(cmd.cmdID);
             }
         }
     }
-    
+
     /**
      * Cria uma funcao de evento para execucao de uma tecla de atalho.
      *
@@ -142,7 +142,7 @@ define(function (require, exports, module) {
             showInputArgs();
         };
     }
-    
+
     /**
      * Realiza o parse do arquivo de configuracao e carrega as novas configuracoes.
      *
@@ -153,30 +153,30 @@ define(function (require, exports, module) {
             var cfg = JSON.parse(cfgData);
 
             if (!cfg) {
-                return;                
+                return;
             }
-                                    
+
             cmdConfig = cfg;
-            
+
             for (var i = 0; i < cmdConfig.length; i++) {
                 var cmd = cmdConfig[i];
-                
+
                 cmd.cmdID = COMMAND_RUNNER + '.cmd-' + regCount++;
 
                 var cmdObj = CommandManager.register(cmd.label, cmd.cmdID, createCommand(cmd));
 
                 cmdsMenu.addMenuItem(cmdObj);
-                
+
                 if (cmd.key) {
-                    KeyBindingManager.addBinding(cmdObj, {key: cmd.key});      
-                }                
+                    KeyBindingManager.addBinding(cmdObj, {key: cmd.key});
+                }
             }
         } catch(err) {
             appendOutput('Erro ao carregar o arquivo cmdrunner.json: ' + err);
             cmdConfig = [];
         }
     }
-    
+
     /**
      * Inicialmente remove todos os eventos associados anteriormente e entao
      * carrega o arquivo de configuracao do executor de comandos caso exita.
@@ -184,14 +184,14 @@ define(function (require, exports, module) {
     function readConfigFile() {
         var rootPath   = ProjectManager.getProjectRoot().fullPath,
             cmdCfgFile = FileSystem.getFileForPath(rootPath + 'cmdrunner.json');
-        
+
         unbindAllHotkeys();
-        
+
         FileUtils.readAsText(cmdCfgFile).done(function (rawText) {
             loadConfigs(rawText);
         });
     }
-    
+
     // Eventos que determinam a carga do arquivo de configuracao do cmd runner.
     $(ProjectManager).on('projectOpen projectRefresh', readConfigFile);
     $(DocumentManager).on('documentSaved', function(evt, doc) {
@@ -199,7 +199,7 @@ define(function (require, exports, module) {
             readConfigFile();
         }
     });
-    
+
     /**
      * Adiciona o texto fornecido no painel inferior.
      *
@@ -210,32 +210,32 @@ define(function (require, exports, module) {
     function appendOutput(output, color, hiddenConsole) {
         if (!panelOut) {
             panelOut = PanelManager.createBottomPanel(COMMAND_RUNNER + '.output', $(panelOutHtml));
-            
+
             $('.close', $('#brackets-cmd-runner-output')).click(function() {
                 panelOut.hide();
             });
         }
-        
+
         var elem = $('#brackets-cmd-runner-console');
 
         output = output || '';
         color = color || 'white';
-        
+
         var tmplate = [];
-        
-        elem.append('<span style="color: ' + color + '">' + ansi2html(Mustache.render('{{row}}', {row: output})) + '</span>');            
-        
+
+        elem.append('<span style="color: ' + color + '">' + ansi2html(Mustache.render('{{row}}', {row: output})) + '</span>');
+
         if (!hiddenConsole) {
             panelOut.show();
         }
-        
+
         elem.animate({ scrollTop: elem[0].scrollHeight }, 'fast');
     }
-    
+
     /**
      * Retorna um array com os parametros do tipo $digito fornecido no comando.
      * @param {string} command String do comando que podera ser executado.
-     * 
+     *
      * @return Array com os paramentros fornecidos na stringo do comando.
      */
     function getParams(command) {
@@ -245,7 +245,7 @@ define(function (require, exports, module) {
 
         while ((m = re.exec(command)) !== null) {
             m = m[0].substr(1);
-            
+
             if (m.match('[0-9]+')) {
                 matches.push(m);
             }
@@ -253,7 +253,7 @@ define(function (require, exports, module) {
 
         return matches;
     }
-    
+
     /**
      * Constroi o comando mesclando os parametros com o template da string do comando.
      *
@@ -265,22 +265,22 @@ define(function (require, exports, module) {
      *
      * @return String do comando meclado com os parametros pronto para ser executado.
      */
-    function buildCommand(command, params, args, argsDefault, opts) {    
+    function buildCommand(command, params, args, argsDefault, opts) {
         for (var i = 0; i < params.length; i++) {
             var idx = parseInt(params[i]);
-            
+
             var value = '';
-            
+
             if (!isNaN(idx)) {
                 value = args[idx] ? args[idx] : (argsDefault[idx] ? argsDefault[idx] : '');
             }
-            
+
             command = command.replace(new RegExp('\\$' + params[i], 'g'), replaceSystemParams(value, opts));
         }
-        
+
         return command;
     }
-    
+
     /**
      * Obtem as opcoes extras fornecidas para o comando meclando-as com as opcoes de execucao padrao.
      *
@@ -292,40 +292,40 @@ define(function (require, exports, module) {
         var defaultOpts = {
             defaultPath: ProjectManager.getProjectRoot().fullPath
         };
-        
+
         var opts = $.extend({}, defaultOpts, objCmd.opts);
-        
+
         //TODO Melhorar!
-        if (opts.defaultPath 
-            && typeof opts.defaultPath == 'string' 
-            && opts.defaultPath.length > 0 
+        if (opts.defaultPath
+            && typeof opts.defaultPath == 'string'
+            && opts.defaultPath.length > 0
             && opts.defaultPath.charAt(0) === '.') {
             opts.defaultPath = defaultOpts.defaultPath + '/' + opts.defaultPath;
         }
-        
+
         opts = replaceSystemParams(opts, opts);
-        
+
         opts.id = cmdId++ + '';
-        
+
         return opts;
     }
-    
+
     /**
      * Substitui as variaveis do comando fornecido pelos valores do sistema.
      *
      * @param {any} command Qualquer valor que se queira substituir pela vlaores do sistema.
      * @param {object} opts Opcoes extras informadas para a execucao do comando.
-     * 
+     *
      * @return {any} O objeto commando fornecido com as variaveis de sistema substituidas.
      */
     function replaceSystemParams(command, opts) {
         if (command == null) {
             return null;
         }
-        
+
         if (typeof command === 'string') {
             var newCommand = command;
-        
+
             for (var param in systemParams) {
 
                 var paramValue = systemParams[param](opts);
@@ -337,20 +337,20 @@ define(function (require, exports, module) {
 
             return command;
         }
-        
+
         if (typeof command === 'object') {
             var newCmd = command instanceof Array ? [] : {};
-            
+
             for (var elem in command) {
                 newCmd[elem] = replaceSystemParams(command[elem], opts);
             }
-            
+
             return newCmd;
-        }    
-        
+        }
+
         return command;
     }
-    
+
     /**
      * Executa o comando fornecido e imprime a saida no painel.
      *
@@ -359,9 +359,9 @@ define(function (require, exports, module) {
      */
     function runCommand(objCmd, args) {
         var opts = getOpts(objCmd);
-        
+
         var command = buildCommand(objCmd.cmd, getParams(objCmd.cmd), args, objCmd.args, opts);
-        
+
         command = replaceSystemParams(command, opts);
 
         appendOutput('Executing: ' + command + '\n', null, opts.hiddenConsole);
@@ -370,8 +370,8 @@ define(function (require, exports, module) {
             appendOutput(data, err ? 'red' : 'white');
         });
     }
-    
-    /** 
+
+    /**
      * Exibe paneil inferior para fornecer parametros para a execucao do comando.
      */
     function showInputArgs() {
@@ -379,76 +379,78 @@ define(function (require, exports, module) {
             panelArgs = PanelManager.createBottomPanel(COMMAND_RUNNER + '.args', $(panelArgsHtml), 40);
 
             var btnClose = $('.close', $('#brackets-cmd-runner-args'));
-            
+
             btnClose.click(function() {
                 if (panelArgs) {
-                    panelArgs.hide();                
-                }                
-            });    
-            
+                    panelArgs.hide();
+                }
+            });
+
             var input = $('input', $('#brackets-cmd-runner-args'));
-            
+
             input.focusout(function() {
                 btnClose.click();
             });
-            
+
             input.keydown(function(evt) {
                 if (evt.which === 27) {
                     btnClose.click();
                 }
             });
-            
+
             input.keypress(function(evt) {
                 if (evt.which === 13) {
                     btnClose.click();
-                    
-                    runCommand(cmdSelected, $('#brackets-cmd-runner-args-val').val().split(':'));
-                }                
+
+                    var splitChar = cmdSelected.splitChar || ':';
+
+                    runCommand(cmdSelected, $('#brackets-cmd-runner-args-val').val().split(splitChar));
+                }
             });
-        } 
-        
+        }
+
         $('#brackets-cmd-runner-args-text').html(cmdSelected.cmd);
         $('#brackets-cmd-runner-args-val').val(cmdSelected.args);
-        
-        // So exibe a caixa de argumentos, se existir pelo menos uma marcacao 
+
+        // So exibe a caixa de argumentos, se existir pelo menos uma marcacao
         // de parametros na construcao do comando.
         if (getParams(cmdSelected.cmd).length === 0) {
             runCommand(cmdSelected, '');
-            
+
         } else {
             panelArgs.show();
         }
-        
+
         //TODO Melhorar
         setTimeout(function() {
             var ipt = $('input', $('#brackets-cmd-runner-args'));
-            
+
             ipt.focus();
             ipt.select();
-            
+
         }, 350);
     }
-    
+
     /**
      * Abre o paneil de busca de comandos.
      */
     function openSearch() {
         QuickOpen.beginSearch('#', '');
-        
+
         hotkeyPressed = true;
-        
+
         setTimeout(function() {
             hotkeyPressed = false;
         }, 300);
-    } 
-    
+    }
+
     /**
-     * Helper function that chains a series of promise-returning functions together via their 
+     * Helper function that chains a series of promise-returning functions together via their
      * done callbacks.
      */
     function chain() {
         var functions = Array.prototype.slice.call(arguments, 0);
-        
+
         if (functions.length > 0) {
             var firstFunction = functions.shift();
             var firstPromise = firstFunction.call();
@@ -457,7 +459,7 @@ define(function (require, exports, module) {
             });
         }
     }
-    
+
     QuickOpen.addQuickOpenPlugin({
         name: 'Command Runner',
         label: 'Command Runner',  // ignored before Sprint 34
@@ -466,127 +468,127 @@ define(function (require, exports, module) {
         done: function () {},
         search: function(query) {
             var cmd = query.substr(1);
-            
+
             var ret = cmdConfig.filter(function(elem) {
                 return cmd.length === 0 || elem.cmd.indexOf(cmd) >= 0 || elem.label.indexOf(cmd) >= 0;
             });
-            
+
             return ret;
-            
+
         },
-        
+
         match: function(query) {
             return query.length > 0 && query.charAt(0) === '#';
         },
-                    
+
         itemSelect: function(item) {
             cmdSelected = item;
-            
+
             showInputArgs();
         },
-        
+
         matcherOptions: { segmentedSearch: true }
-        
+
         //itemFocus: function () {},
         //resultsFormatter: function(item) {
         //    var displayName = highlightMatch(item);
         //    return "<li>" + displayName + "</li>";
         //},
     });
-    
+
 
     // Inicia conexao com NodeJS
     AppInit.appReady(function () {
         var path = ExtensionUtils.getModulePath(module, 'node/NodeBridgeDomain');
-        
+
         var nodeConnection = new NodeConnection();
-        
+
         var startNodeTimeout = 0;
-        
+
         $(nodeConnection).on('nodebridge.update', function(evt, ret) {
             appendOutput(ret.data, ret.err ? 'red' : 'white', ret.hiddenConsole);
         });
-        
+
         // Inicia a conexao com o NodeJS.
         function connect() {
             var connectionPromise = nodeConnection.connect(true);
-            
+
             connectionPromise.fail(function (err) {
                 console.error('[brackets-tekton] failed to connect to node: ', err);
                 if (DEBUG) alert('Erro connect: ' + JSON.stringify(err));
             });
-            
+
             return connectionPromise;
         }
-        
+
         // Inicia a bridge que executara os comandos
         function loadBridge() {
             var path = ExtensionUtils.getModulePath(module, 'node/NodeBridgeDomain');
-            
+
             var loadPromise = nodeConnection.loadDomains([path], true);
-            
+
             loadPromise.fail(function (err) {
                 console.log('[brackets-tekton] failed to load domain: ', err);
-                
+
                 if (DEBUG) alert('Erro loadBridge: ' + JSON.stringify(err));
             });
-            
+
             return loadPromise;
         }
-        
+
         // Executa comando a atraves da bridge do NodeJS.
         function execCmd(cmd, args, options, callback, count) {
             if (!nodeConnection.domains.nodebridge) {
                 clearTimeout(startNodeTimeout);
-                
-                if (count > 10) {                    
+
+                if (count > 10) {
                     appendOutput('Was not possible execute command ' + cmd + ' because NodeJS not started!\n');
                     return;
                 }
-                
+
 		        appendOutput('Waiting for NodeJS...\n');
-			
+
                 startNodeTimeout = setTimeout(function() {
                     execCmd.call(null, cmd, args, options, callback, (count || 1) + 1);
                 }, 1000);
 
                 return;
             }
-            
+
             var promise = nodeConnection.domains.nodebridge.execCmd(cmd, args, options);
-            
+
             promise.fail(function (err, data) {
                 console.error('[brackets-tekton] execution: ', arguments);
 
                 appendOutput('Error when executing supplied command: ' + cmd + (args || []).join(' ') + ' Log: ' + err);
             });
-            
+
             promise.done(function (data) {
                 //funOutData(data);
             });
         }
-        
+
         // Mata os comandos atraves da bridge do NodeJS.
         function killCmd(id) {
             if (!nodeConnection.domains.nodebridge) {
                 return;
             }
-            
+
             var promise = nodeConnection.domains.nodebridge.killCmd(id);
-            
+
             promise.fail(function (err, data) {
                 console.error('[brackets-tekton] kill execution: ', arguments);
-                
+
                 appendOutput('Error when executing kill command!', 'red');
             });
-            
+
             promise.done(function (data) {
                 appendOutput('Killed!');
             });
-            
+
             appendOutput('Sent kill command.\n');
         }
-        
+
         execCmdFnc = execCmd;
         killCmdFnc = killCmd;
 

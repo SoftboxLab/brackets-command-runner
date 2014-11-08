@@ -23,18 +23,18 @@ The file cmdrunner.json is a JSON file that contains the configuration of comman
 ```
 {
     "label": "string",
-    
+
     "cmd": "string",
-    
+
     "args": [ array ],
-    
+
     "key": "string",
-    
+
     "opts": {
         "defaultPath": "string",
-        
+
         "hiddenConsole": bool,
-        
+
         "killCmd": "string"
     }
 }
@@ -50,8 +50,10 @@ Following is a description of each attribute:
 
 **key:** Hotkey that will perform a quick access to command.
 
-**opts:** Optional attributes that configure some options of execution enviroment. 
-    
+**splitChar:** Specify the char that will separate arguments of command. Default value is ':'.
+
+**opts:** Optional attributes that configure some options of execution enviroment.
+
 **opts.defaultPath:** Directory path where command will executed.
 
 **opts.hiddenConsole:** True indicates that output panel will not open after command execution.
@@ -70,12 +72,16 @@ Screenshots
 Change log
 ----------
 
+## 0.0.15
+Features:
+    - Accepted pull request to work in OSX.
+    - Add new option splitChar.
+
 ## 0.0.14
 
 Features:
 
     - Add killCmd option on configuration.
-
 
 ## 0.0.13
 
@@ -93,7 +99,7 @@ Features:
     - Hide panel menu option
     - Clear panel menu option
     - Add extra option hiddenConsole.
-    
+
 Bugfixes:
 
     - Fix output update on panel output.
