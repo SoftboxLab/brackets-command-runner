@@ -35,7 +35,9 @@ The file cmdrunner.json is a JSON file that contains the configuration of comman
 
         "hiddenConsole": bool,
 
-        "killCmd": "string"
+        "killCmd": "string",
+
+        "closeStdin": bool
     }
 }
 ```
@@ -59,6 +61,8 @@ Following is a description of each attribute:
 **opts.hiddenConsole:** True indicates that output panel will not open after command execution.
 
 **opts.killCmd:** Command that will be triggered by 'Kill Commands' menu option.
+
+**opts.closeStdin:** Closes the stdin of the child processes, which will generally forc it into non-interactive mode. Defaults to true.
 
 
 
