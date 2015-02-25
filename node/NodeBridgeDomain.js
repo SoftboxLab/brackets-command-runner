@@ -161,7 +161,9 @@
         });
 
         terminal.stdin.write(cmd + '\n');
-        terminal.stdin.end();
+        if (options.closeStdin !== false) {
+            terminal.stdin.end();
+        }
     }
 
     /**
