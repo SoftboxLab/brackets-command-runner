@@ -17,7 +17,7 @@ define(function (require, exports, module) {
         StatusBar           = brackets.getModule('widgets/StatusBar'),
         FileSystem          = brackets.getModule('filesystem/FileSystem'),
         FileUtils           = brackets.getModule('file/FileUtils'),
-        PanelManager        = brackets.getModule('view/PanelManager'),
+        PanelManager        = brackets.getModule('view/WorkspaceManager'),
         Resizer             = brackets.getModule('utils/Resizer'),
         DocumentManager     = brackets.getModule('document/DocumentManager');
 
